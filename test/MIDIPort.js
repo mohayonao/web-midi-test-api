@@ -1,114 +1,266 @@
 import assert from "power-assert";
 import sinon from "sinon";
-import WebMIDITestAPI from "../src/WebMIDITestAPI";
+import MIDIAccess from "../src/MIDIAccess";
+import EventEmitter from "../src/EventEmitter";
 import MIDIPort from "../src/MIDIPort";
+import MIDIDevice from "../src/MIDIDevice";
 
 describe("MIDIPort", () => {
-  let api;
+  let access, device, port;
 
   beforeEach(() => {
-    api = new WebMIDITestAPI();
+    access = new MIDIAccess({});
+    device = new MIDIDevice();
+    port = device.inputs[0];
   });
 
-  describe("constructor(api: WebMIDITestAPI, opts = {})", () => {
+  describe("constructor(access: MIDIAccess, port: MIDIDeviceMessagePort)", () => {
     it("works", () => {
-      let port = new MIDIPort(api);
+      let input = new MIDIPort(access, port);
 
-      assert(port instanceof MIDIPort);
-      assert(port.$api === api);
+      assert(input instanceof EventEmitter);
+      assert(input instanceof MIDIPort);
+      assert(input.$access === access);
+      assert(input.$port === port);
     });
   });
   describe("#id: string", () => {
     it("works", () => {
-      let port = new MIDIPort(api, { id: "id" });
+      let input = new MIDIPort(access, port);
 
-      assert(port.id === "id");
+      assert(input.id === port.id);
     });
   });
   describe("#manufacturer: string", () => {
     it("works", () => {
-      let port = new MIDIPort(api, { manufacturer: "manufacturer" });
+      let input = new MIDIPort(access, port);
 
-      assert(port.manufacturer === "manufacturer");
+      assert(input.manufacturer === port.manufacturer);
     });
   });
   describe("#name: string", () => {
     it("works", () => {
-      let port = new MIDIPort(api, { name: "name" });
+      let input = new MIDIPort(access, port);
 
-      assert(port.name === "name");
+      assert(input.name === port.name);
     });
   });
   describe("#type: string", () => {
     it("works", () => {
-      let port = new MIDIPort(api, {});
+      let input = new MIDIPort(access, port);
 
-      assert(port.type === undefined);
+      assert(input.type === port.type);
     });
   });
   describe("#version: string", () => {
     it("works", () => {
-      let port = new MIDIPort(api, { version: "version" });
+      let input = new MIDIPort(access, port);
 
-      assert(port.version === "version");
+      assert(input.version === port.version);
     });
   });
   describe("#state: string", () => {
     it("works", () => {
-      let port = new MIDIPort(api, {});
+      let input = new MIDIPort(access, port);
 
-      assert(port.state === "connected");
+      assert(input.state === port.state);
     });
   });
   describe("#connection: string", () => {
     it("works", () => {
-      let port = new MIDIPort(api, {});
+      let input = new MIDIPort(access, port);
 
-      assert(port.connection === "closed");
+      assert(input.connection === "closed");
     });
   });
   describe("#onstatechange: EventHandler", () => {
     it("works", () => {
-      let port = new MIDIPort(api, {});
+      let input = new MIDIPort(access, port);
       let onstatechange = sinon.spy();
       let event = {};
 
-      port.onstatechange = onstatechange;
-      port.onstatechange = {};
-      assert(port.onstatechange === onstatechange);
+      input.onstatechange = onstatechange;
+      input.onstatechange = {};
+      assert(input.onstatechange === onstatechange);
 
-      port.emit("statechange", event);
+      input.emit("statechange", event);
       assert(onstatechange.calledOnce);
       assert(onstatechange.args[0][0] === event);
     });
     it("null", () => {
-      let port = new MIDIPort(api, {});
+      let input = new MIDIPort(access, port);
       let event = {};
 
-      port.onstatechange = null;
-      port.onstatechange = {};
+      input.onstatechange = null;
+      input.onstatechange = {};
 
-      assert(port.onstatechange === null);
+      assert(input.onstatechange === null);
       assert.doesNotThrow(() => {
-        port.emit("statechange", event);
+        input.emit("statechange", event);
       });
     });
   });
   describe("#open(): Promise<MIDIPort>", () => {
     it("works", () => {
-      let port = new MIDIPort(api, {});
+      let input = new MIDIPort(access, port);
 
-      return port.open().then((value) => {
-        assert(value === port);
+      access.onstatechange = sinon.spy();
+      input.onstatechange = sinon.spy();
+
+      return Promise.resolve().then(() => {
+        return device.connect();
+      }).then(() => {
+        return input.open();
+      }).then((value) => {
+        assert(value === input);
+        assert(input.connection === "open");
+        assert(access.onstatechange.calledOnce);
+        assert(access.onstatechange.args[0][0].port === input);
+        assert(input.onstatechange.calledOnce);
+        assert(input.onstatechange.args[0][0].port === input);
+
+        access.onstatechange.reset();
+        input.onstatechange.reset();
+
+        return input.open();
+      }).then((value) => {
+        assert(value === input);
+        assert(input.connection === "open");
+        assert(!access.onstatechange.called);
+        assert(!input.onstatechange.called);
+      });
+    });
+    it("pending", () => {
+      let input = new MIDIPort(access, port);
+
+      access.onstatechange = sinon.spy();
+      input.onstatechange = sinon.spy();
+
+      return Promise.resolve().then(() => {
+        return device.disconnect();
+      }).then(() => {
+        return input.open();
+      }).then((value) => {
+        assert(value === input);
+        assert(input.connection === "pending");
+        assert(access.onstatechange.calledOnce);
+        assert(access.onstatechange.args[0][0].port === input);
+        assert(input.onstatechange.calledOnce);
+        assert(input.onstatechange.args[0][0].port === input);
+
+        access.onstatechange.reset();
+        input.onstatechange.reset();
+
+        return input.open();
+      }).then((value) => {
+        assert(value === input);
+        assert(input.connection === "pending");
+        assert(!access.onstatechange.called);
+        assert(!input.onstatechange.called);
+      });
+    });
+    it("pending -> open", () => {
+      let input = new MIDIPort(access, port);
+
+      access.onstatechange = sinon.spy();
+      input.onstatechange = sinon.spy();
+
+      return Promise.resolve().then(() => {
+        return device.disconnect();
+      }).then(() => {
+        return input.open();
+      }).then((value) => {
+        assert(value === input);
+        assert(input.connection === "pending");
+        assert(access.onstatechange.calledOnce);
+        assert(access.onstatechange.args[0][0].port === input);
+        assert(input.onstatechange.calledOnce);
+        assert(input.onstatechange.args[0][0].port === input);
+
+        access.onstatechange.reset();
+        input.onstatechange.reset();
+
+        return device.connect();
+      }).then(() => {
+        assert(input.connection === "open");
+        assert(access.onstatechange.calledOnce);
+        assert(access.onstatechange.args[0][0].port === input);
+        assert(input.onstatechange.calledOnce);
+        assert(input.onstatechange.args[0][0].port === input);
       });
     });
   });
   describe("#close(): Promise<MIDIPort>", () => {
     it("works", () => {
-      let port = new MIDIPort(api, {});
+      let input = new MIDIPort(access, port);
 
-      return port.close().then((value) => {
-        assert(value === port);
+      access.onstatechange = sinon.spy();
+      input.onstatechange = sinon.spy();
+
+      return Promise.resolve().then(() => {
+        return device.connect();
+      }).then(() => {
+        return input.open();
+      }).then((value) => {
+        assert(value === input);
+        assert(input.connection === "open");
+
+        access.onstatechange.reset();
+        input.onstatechange.reset();
+
+        return input.close();
+      }).then((value) => {
+        assert(value === input);
+        assert(input.connection === "closed");
+        assert(access.onstatechange.calledOnce);
+        assert(access.onstatechange.args[0][0].port === input);
+        assert(input.onstatechange.calledOnce);
+        assert(input.onstatechange.args[0][0].port === input);
+
+        access.onstatechange.reset();
+        input.onstatechange.reset();
+
+        return input.close();
+      }).then((value) => {
+        assert(value === input);
+        assert(input.connection === "closed");
+        assert(!access.onstatechange.called);
+        assert(!input.onstatechange.called);
+      });
+    });
+    it("open -> closed", () => {
+      let input = new MIDIPort(access, port);
+
+      access.onstatechange = sinon.spy();
+      input.onstatechange = sinon.spy();
+
+      return Promise.resolve().then(() => {
+        return device.connect();
+      }).then(() => {
+        return input.open();
+      }).then((value) => {
+        assert(value === input);
+        assert(input.connection === "open");
+
+        access.onstatechange.reset();
+        input.onstatechange.reset();
+
+        return device.disconnect();
+      }).then(() => {
+        assert(input.connection === "closed");
+        assert(access.onstatechange.calledOnce);
+        assert(access.onstatechange.args[0][0].port === input);
+        assert(input.onstatechange.calledOnce);
+        assert(input.onstatechange.args[0][0].port === input);
+
+        access.onstatechange.reset();
+        input.onstatechange.reset();
+
+        return device.connect();
+      }).then(() => {
+        assert(input.connection === "closed");
+        assert(!access.onstatechange.called);
+        assert(!input.onstatechange.called);
       });
     });
   });

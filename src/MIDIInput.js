@@ -1,22 +1,18 @@
 import MIDIPort from "./MIDIPort";
 
 // interface MIDIInput : MIDIPort {
-//                 attribute EventHandler onmidimessage;
+//   attribute EventHandler onmidimessage;
 // };
 
 export default class MIDIInput extends MIDIPort {
-  constructor(api, opts) {
-    super(api, opts);
+  constructor(access, port) {
+    super(access, port);
 
-    this.on("midimessage", (e) => {
-      if (this._onmidimessage !== null) {
+    port.on("midimessage", (e) => {
+      if (this._onmidimessage !== null && this.connection === "open") {
         this._onmidimessage.call(this, e);
       }
     });
-  }
-
-  get type() {
-    return "input";
   }
 
   get onmidimessage() {
@@ -26,6 +22,9 @@ export default class MIDIInput extends MIDIPort {
   set onmidimessage(callback) {
     if (callback === null || typeof callback === "function") {
       this._onmidimessage = callback;
+      if (callback && this.connection !== "open") {
+        this.open();
+      }
     }
   }
 }

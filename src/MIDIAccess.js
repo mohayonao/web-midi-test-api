@@ -1,10 +1,12 @@
 import EventEmitter from "./EventEmitter";
+import MIDIInput from "./MIDIInput";
+import MIDIOutput from "./MIDIOutput";
 
 // interface MIDIAccess : EventTarget {
-//     readonly    attribute MIDIInputMap  inputs;
-//     readonly    attribute MIDIOutputMap outputs;
-//                 attribute EventHandler  onstatechange;
-//     readonly    attribute boolean       sysexEnabled;
+//   readonly  attribute MIDIInputMap  inputs;
+//   readonly  attribute MIDIOutputMap outputs;
+//             attribute EventHandler  onstatechange;
+//   readonly  attribute boolean       sysexEnabled;
 // };
 
 export default class MIDIAccess extends EventEmitter {
@@ -23,11 +25,11 @@ export default class MIDIAccess extends EventEmitter {
   }
 
   get inputs() {
-    return new Map(this.$api.getMIDIInputs().map(port => [ port.name, port ]));
+    return new Map(this.$api.outputs.map(port => [ port.name, new MIDIInput(this, port.target) ]));
   }
 
   get outputs() {
-    return new Map(this.$api.getMIDIOutputs().map(port => [ port.name, port ]));
+    return new Map(this.$api.inputs.map(port => [ port.name, new MIDIOutput(this, port.target) ]));
   }
 
   get onstatechange() {
