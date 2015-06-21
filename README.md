@@ -36,7 +36,7 @@ var api = new WebMIDITestAPI();
 var device = api.createMIDIDevice();
 var input;
 
-api.requestMIDIAccess(function(access) {
+api.requestMIDIAccess().then(function(access) {
   input = access.inputs.values().next().value;
 
   input.onmidimessage = sinon.spy();
@@ -59,7 +59,7 @@ var output;
 
 device.inputs[0].onmidimessage = sinon.spy();
 
-api.requestMIDIAccess(function(access) {
+api.requestMIDIAccess().then(function(access) {
   output = access.outputs.values().next().value;
 
   return output.open();
@@ -78,7 +78,7 @@ var api = new WebMIDITestAPI();
 var device = api.createMIDIDevice();
 var input;
 
-api.requestMIDIAccess(function(access) {
+api.requestMIDIAccess().then(function(access) {
   input = access.inputs.values().next().value;
 
   assert(input.state === "connected");
@@ -95,7 +95,6 @@ api.requestMIDIAccess(function(access) {
   assert(input.connection === "closed");
 
   return device.connect();
-})
 }).then(function() {
   assert(input.state === "connected");
   assert(input.connection === "open");
