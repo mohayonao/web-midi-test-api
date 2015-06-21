@@ -1,19 +1,21 @@
 import assert from "power-assert";
 import sinon from "sinon";
-import WebMIDITestAPI from "../src/WebMIDITestAPI";
+import MIDIAccess from "../src/MIDIAccess";
 import MIDIPort from "../src/MIDIPort";
 import MIDIInput from "../src/MIDIInput";
+import { MIDIDeviceMessagePort } from "../src/MIDIDevice";
 
 describe("MIDIInput", () => {
-  let api;
+  let access, port;
 
   beforeEach(() => {
-    api = new WebMIDITestAPI();
+    access = new MIDIAccess({});
+    port = new MIDIDeviceMessagePort({}, "input");
   });
 
-  describe("constructor(api: WebMIDITestAPI, opts = {})", () => {
+  describe("constructor(access: MIDIAccess, port: MIDIDeviceMessagePort)", () => {
     it("works", () => {
-      let input = new MIDIInput(api, {});
+      let input = new MIDIInput(access, port);
 
       assert(input instanceof MIDIPort);
       assert(input instanceof MIDIInput);
@@ -21,14 +23,14 @@ describe("MIDIInput", () => {
   });
   describe("#type: string", () => {
     it("works", () => {
-      let input = new MIDIInput(api, {});
+      let input = new MIDIInput(access, port);
 
       assert(input.type === "input");
     });
   });
   describe("#onmidimessage: EventHandler", () => {
     it("works", () => {
-      let input = new MIDIInput(api, {});
+      let input = new MIDIInput(access, port);
       let onmidimessage = sinon.spy();
       let event = {};
 
@@ -36,20 +38,34 @@ describe("MIDIInput", () => {
       input.onmidimessage = {};
       assert(input.onmidimessage === onmidimessage);
 
-      input.emit("midimessage", event);
-      assert(onmidimessage.calledOnce);
-      assert(onmidimessage.args[0][0] === event);
+      return Promise.resolve().then(() => {
+        return input.open();
+      }).then(() => {
+        port.emit("midimessage", event);
+        assert(onmidimessage.calledOnce);
+        assert(onmidimessage.args[0][0] === event);
+        onmidimessage.reset();
+      }).then(() => {
+        return input.close();
+      }).then(() => {
+        port.emit("midimessage", event);
+        assert(!onmidimessage.called);
+      });
     });
     it("null", () => {
-      let input = new MIDIInput(api, {});
+      let input = new MIDIInput(access, port);
       let event = {};
 
       input.onmidimessage = null;
       input.onmidimessage = {};
-
       assert(input.onmidimessage === null);
-      assert.doesNotThrow(() => {
-        input.emit("midimessage", event);
+
+      return Promise.resolve().then(() => {
+        return input.open();
+      }).then(() => {
+        assert.doesNotThrow(() => {
+          port.emit("midimessage", event);
+        });
       });
     });
   });

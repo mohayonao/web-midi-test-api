@@ -1,30 +1,25 @@
 import EventEmitter from "./EventEmitter";
-import util from "./util";
 
 // interface MIDIPort : EventTarget {
-//     readonly    attribute DOMString               id;
-//     readonly    attribute DOMString?              manufacturer;
-//     readonly    attribute DOMString?              name;
-//     readonly    attribute MIDIPortType            type;
-//     readonly    attribute DOMString?              version;
-//     readonly    attribute MIDIPortDeviceState     state;
-//     readonly    attribute MIDIPortConnectionState connection;
-//                 attribute EventHandler            onstatechange;
-//     Promise<MIDIPort> open ();
-//     Promise<MIDIPort> close ();
+//   readonly  attribute DOMString               id;
+//   readonly  attribute DOMString?              manufacturer;
+//   readonly  attribute DOMString?              name;
+//   readonly  attribute MIDIPortType            type;
+//   readonly  attribute DOMString?              version;
+//   readonly  attribute MIDIPortDeviceState     state;
+//   readonly  attribute MIDIPortConnectionState connection;
+//             attribute EventHandler            onstatechange;
+//   Promise<MIDIPort> open();
+//   Promise<MIDIPort> close();
 // };
 
 export default class MIDIPort extends EventEmitter {
-  constructor(api, opts = {}) {
+  constructor(access, port) {
     super();
 
-    this.$api = api;
+    this.$access = access;
+    this.$port = port;
 
-    this._id = util.defaults(opts.id, Date.now().toString());
-    this._manufacturer = util.defaults(opts.manufacturer, "");
-    this._name = util.defaults(opts.name, "");
-    this._version = util.defaults(opts.version, "");
-    this._state = "connected";
     this._connection = "closed";
     this._onstatechange = null;
 
@@ -33,30 +28,52 @@ export default class MIDIPort extends EventEmitter {
         this._onstatechange.call(this, e);
       }
     });
+    port.on("connected", () => {
+      if (this.connection === "pending") {
+        this._open().then(() => {
+          this._connection = "open";
+
+          let event = { port: this };
+          this.$access.emit("statechange", event);
+          this.emit("statechange", event);
+        });
+      }
+    });
+    port.on("disconnected", () => {
+      if (this.connection !== "closed") {
+        this._close().then(() => {
+          this._connection = "closed";
+
+          let event = { port: this };
+          this.$access.emit("statechange", event);
+          this.emit("statechange", event);
+        });
+      }
+    });
   }
 
   get id() {
-    return this._id;
+    return this.$port.id;
   }
 
   get manufacturer() {
-    return this._manufacturer;
+    return this.$port.manufacturer;
   }
 
   get name() {
-    return this._name;
+    return this.$port.name;
   }
 
   get type() {
-    // subclass responsibility
+    return this.$port.type;
   }
 
   get version() {
-    return this._version;
+    return this.$port.version;
   }
 
   get state() {
-    return this._state;
+    return this.$port.state;
   }
 
   get connection() {
@@ -82,14 +99,22 @@ export default class MIDIPort extends EventEmitter {
       if (this.state === "disconnected") {
         this._connection = "pending";
 
-        let event = {};
-        this.$api.emit("statechange", event);
+        let event = { port: this };
+        this.$access.emit("statechange", event);
         this.emit("statechange", event);
 
         return resolve(this);
       }
 
-      return this._open().then(resolve, reject);
+      return this._open().then(() => {
+        this._connection = "open";
+
+        let event = { port: this };
+        this.$access.emit("statechange", event);
+        this.emit("statechange", event);
+
+        resolve(this);
+      }, reject);
     });
   }
 
@@ -102,8 +127,8 @@ export default class MIDIPort extends EventEmitter {
       return this._close().then(() => {
         this._connection = "closed";
 
-        let event = {};
-        this.$api.emit("statechange", event);
+        let event = { port: this };
+        this.$access.emit("statechange", event);
         this.emit("statechange", event);
 
         resolve(this);

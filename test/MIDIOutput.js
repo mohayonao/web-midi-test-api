@@ -1,45 +1,66 @@
 import assert from "power-assert";
-import WebMIDITestAPI from "../src/WebMIDITestAPI";
+import MIDIAccess from "../src/MIDIAccess";
 import MIDIPort from "../src/MIDIPort";
 import MIDIOutput from "../src/MIDIOutput";
+import { MIDIDeviceMessagePort } from "../src/MIDIDevice";
 
 describe("MIDIOutput", () => {
-  let api;
+  let access, port;
 
   beforeEach(() => {
-    api = new WebMIDITestAPI();
+    access = new MIDIAccess({});
+    port = new MIDIDeviceMessagePort({}, "output");
   });
 
-  describe("constructor(api: WebMIDITestAPI, opts = {})", () => {
+  describe("constructor(access: MIDIAccess, port: MIDIDeviceMessagePort)", () => {
     it("works", () => {
-      let port = new MIDIOutput(api, {});
+      let output = new MIDIOutput(access, port);
 
-      assert(port instanceof MIDIPort);
-      assert(port instanceof MIDIOutput);
+      assert(output instanceof MIDIPort);
+      assert(output instanceof MIDIOutput);
     });
   });
   describe("#type: string", () => {
     it("works", () => {
-      let input = new MIDIOutput(api, {});
+      let output = new MIDIOutput(access, port);
 
-      assert(input.type === "output");
+      assert(output.type === "output");
     });
   });
   describe("#send(data: number[]): void", () => {
     it("works", () => {
-      let port = new MIDIOutput(api, {});
+      let output = new MIDIOutput(access, port);
 
       assert.doesNotThrow(() => {
-        port.send([ 0x90, 0x30, 0x64 ]);
+        output.send([ 0x90, 0x30, 0x64 ]);
+      });
+
+      assert.throws(() => {
+        output.send([ 0x00, 0x00, 0x00 ]);
+      }, TypeError);
+    });
+    it("sysex: false", () => {
+      let output = new MIDIOutput(access, port);
+
+      assert.throws(() => {
+        output.send([ 0xf0, 0x00, 0x20, 0x29, 0x02, 0x0a, 0x78 ]);
+      }, Error);
+    });
+    it("sysex: true", () => {
+      let access = new MIDIAccess({}, { sysex: true });
+      let output = new MIDIOutput(access, port);
+
+      assert.doesNotThrow(() => {
+        output.send([ 0xf0, 0x00, 0x20, 0x29, 0x02, 0x0a, 0x78 ]);
       });
     });
   });
   describe("#clear(): void", () => {
     it("works", () => {
-      let port = new MIDIOutput(api, {});
+      let output = new MIDIOutput(access, port);
 
       assert.doesNotThrow(() => {
-        port.clear();
+        output.clear();
       });
     });
   });

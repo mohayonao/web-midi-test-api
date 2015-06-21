@@ -1,22 +1,29 @@
 import MIDIPort from "./MIDIPort";
+import util from "./util";
 
 // interface MIDIOutput : MIDIPort {
-//     void send (sequence<octet> data, optional double timestamp);
-//     void clear ();
+//   void send(sequence<octet> data, optional double timestamp);
+//   void clear();
 // };
 
 export default class MIDIOutput extends MIDIPort {
-  constructor(api, opts) {
-    super(api, opts);
+  constructor(access, port) {
+    super(access, port);
   }
 
-  get type() {
-    return "output";
-  }
-
-  send() {
+  send(data, timestamp) {
+    if (!util.validateMidiMessage(data)) {
+      throw new TypeError("Invalid MIDI message: " + util.convertMIDIMessageToString(data));
+    }
+    if ((data[0] & 0xf0) === 0xf0 && !this.$access.sysexEnabled) {
+      throw new Error("System exclusive message is not allowed");
+    }
+    if (this.connection === "open") {
+      this.$port.send(data, timestamp);
+    }
   }
 
   clear() {
+    this.$port.clear();
   }
 }
