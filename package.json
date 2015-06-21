@@ -1,14 +1,44 @@
 {
   "name": "web-midi-test-api",
   "description": "Web MIDI API for CI",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "author": "Nao Yonamine <mohayonao@gmail.com>",
   "bugs": {
     "url": "https://github.com/mohayonao/web-midi-test-api/issues"
   },
-  "licenses": "MIT",
+  "devDependencies": {
+    "babel": "^5.5.8",
+    "babel-eslint": "^3.1.17",
+    "eslint": "^0.23.0",
+    "espower-babel": "^3.2.0",
+    "isparta": "^3.0.3",
+    "mocha": "^2.2.5",
+    "power-assert": "^0.11.0",
+    "sinon": "^1.15.3"
+  },
+  "files": [
+    "package.json",
+    "README.md",
+    "index.js",
+    "lib"
+  ],
+  "homepage": "https://github.com/mohayonao/web-midi-test-api/",
+  "keywords": [
+    "midi",
+    "test"
+  ],
+  "license": "MIT",
+  "main": "./index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/mohayonao/web-midi-test-api.git"
+  },
+  "scripts": {
+    "build": "babel src --out-dir lib",
+    "cover": "babel-node $(npm bin)/isparta cover --report text --report html --report lcov _mocha",
+    "lint": "eslint src test",
+    "prepublish": "rm -rf lib && npm run lint && npm run test && npm run build",
+    "test": "mocha --compilers js:espower-babel/guess",
+    "travis": "npm run lint && npm run cover"
   }
 }
