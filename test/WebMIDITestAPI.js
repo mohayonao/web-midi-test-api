@@ -14,14 +14,21 @@ describe("WebMIDITestAPI", () => {
       assert(typeof api.requestMIDIAccess === "function");
     });
   });
-  describe("#inputs: MIDIDeviceMessagePort[]", () => {
+  describe("#devices: MIDIDevice[]", () => {
+    it("works", () => {
+      const api = new WebMIDITestAPI();
+
+      assert.deepEqual(api.devices, []);
+    });
+  });
+  describe("#inputs: MIDIDevice.MessagePort[]", () => {
     it("works", () => {
       const api = new WebMIDITestAPI();
 
       assert.deepEqual(api.inputs, []);
     });
   });
-  describe("#outputs: MIDIDeviceMessagePort[]", () => {
+  describe("#outputs: MIDIDevice.MessagePort[]", () => {
     it("works", () => {
       const api = new WebMIDITestAPI();
 

@@ -15,7 +15,7 @@ describe("MIDIInput", () => {
     port = new MIDIDevice.MessagePort({}, "input");
   });
 
-  describe("constructor(access: MIDIAccess, port: MIDIDeviceMessagePort)", () => {
+  describe("constructor(access: MIDIAccess, port: MIDIDevice.MessagePort)", () => {
     it("works", () => {
       const input = new MIDIInput(access, port);
 

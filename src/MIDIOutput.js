@@ -9,10 +9,6 @@ const util = require("./util");
 // };
 
 class MIDIOutput extends MIDIPort {
-  constructor(access, port) {
-    super(access, port);
-  }
-
   send(data, timestamp) {
     if (!util.validateMidiMessage(data)) {
       throw new TypeError("Invalid MIDI message: " + util.convertMIDIMessageToString(data));

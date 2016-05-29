@@ -44,4 +44,32 @@ function validateMidiMessage(data) {
   return false;
 }
 
-module.exports = { convertMIDIMessageToString, dec2hex, defaults, validateMidiMessage };
+const ChannelNames = {};
+
+function makeChannelName(deviceName) {
+  const m = /^(.+?)\s*(\d+)$/.exec(deviceName);
+
+  let name, index, result;
+
+  if (m === null) {
+    name = "" + deviceName;
+    index = 1;
+  } else {
+    name = m[1];
+    index = m[2];
+  }
+
+  ChannelNames[name] = Math.max(1, (index|0), ChannelNames[name] || 0);
+
+  if (ChannelNames[name] === 1) {
+    result = name;
+  } else {
+    result = name + " " + ChannelNames[name];
+  }
+
+  ChannelNames[name] += 1;
+
+  return result;
+}
+
+module.exports = { convertMIDIMessageToString, dec2hex, defaults, validateMidiMessage, makeChannelName };

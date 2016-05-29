@@ -68,4 +68,17 @@ describe("util", () => {
       assert(util.validateMidiMessage(new Uint8Array([ 0x90, 0x00, 0x00 ])) === true);
     });
   });
+
+  describe("makeChannelName(deviceName: string): string", () => {
+    it("works", () => {
+      assert(util.makeChannelName("Test MIDI Device") === "Test MIDI Device");
+      assert(util.makeChannelName("Test MIDI Device") === "Test MIDI Device 2");
+      assert(util.makeChannelName("Test MIDI Device") === "Test MIDI Device 3");
+
+      assert(util.makeChannelName("Test MIDI Device II 4") === "Test MIDI Device II 4");
+      assert(util.makeChannelName("Test MIDI Device II") === "Test MIDI Device II 5");
+      assert(util.makeChannelName("Test MIDI Device II 8") === "Test MIDI Device II 8");
+      assert(util.makeChannelName("Test MIDI Device II") === "Test MIDI Device II 9");
+    });
+  });
 });

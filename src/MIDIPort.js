@@ -35,7 +35,8 @@ class MIDIPort extends events.EventEmitter {
         this._open().then(() => {
           this._connection = "open";
 
-          let event = { port: this };
+          const event = { port: this };
+
           this.$access.emit("statechange", event);
           this.emit("statechange", event);
         });
@@ -46,7 +47,8 @@ class MIDIPort extends events.EventEmitter {
         this._close().then(() => {
           this._connection = "closed";
 
-          let event = { port: this };
+          const event = { port: this };
+
           this.$access.emit("statechange", event);
           this.emit("statechange", event);
         });

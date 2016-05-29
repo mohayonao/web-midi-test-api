@@ -38,7 +38,7 @@ describe("MIDIDevice", () => {
       assert(device.numberOfOutputs === 1);
     });
   });
-  describe("#inputs: MIDIDeviceMessagePort[]", () => {
+  describe("#inputs: MIDIDevice.MessagePort[]", () => {
     it("works", () => {
       const device = new MIDIDevice({ numberOfInputs: 2 });
 
@@ -49,7 +49,7 @@ describe("MIDIDevice", () => {
       assert(device.inputs[1] instanceof MIDIDevice.MessagePort);
     });
   });
-  describe("#outputs: MIDIDeviceMessagePort[]", () => {
+  describe("#outputs: MIDIDevice.MessagePort[]", () => {
     it("works", () => {
       const device = new MIDIDevice({ numberOfOutputs: 2 });
 
@@ -94,7 +94,7 @@ describe("MIDIDevice", () => {
   });
 });
 
-describe("MIDIDeviceMessageChannel", () => {
+describe("MIDIDevice.MessageChannel", () => {
   let device = null;
 
   beforeEach(() => {
@@ -128,14 +128,14 @@ describe("MIDIDeviceMessageChannel", () => {
   });
 });
 
-describe("MIDIDeviceMessagePort", () => {
+describe("MIDIDevice/MessagePort", () => {
   let channel = null;
 
   beforeEach(() => {
     channel = { id: "00000000", manufacturer: "manufacturer", name: "name", version: "version", state: "connected" };
   });
 
-  describe("constructor(channel: MIDIDeviceMessageChannel)", () => {
+  describe("constructor(channel: MIDIDevice.MessageChannel)", () => {
     it("works", () => {
       const port = new MIDIDevice.MessagePort(channel, "input");
 
@@ -249,18 +249,5 @@ describe("MIDIDeviceMessagePort", () => {
         port.clear();
       });
     });
-  });
-});
-
-describe("makeChannelName(deviceName: string): string", () => {
-  it("works", () => {
-    assert(MIDIDevice.makeChannelName("Test MIDI Device") === "Test MIDI Device");
-    assert(MIDIDevice.makeChannelName("Test MIDI Device") === "Test MIDI Device 2");
-    assert(MIDIDevice.makeChannelName("Test MIDI Device") === "Test MIDI Device 3");
-
-    assert(MIDIDevice.makeChannelName("Test MIDI Device II 4") === "Test MIDI Device II 4");
-    assert(MIDIDevice.makeChannelName("Test MIDI Device II") === "Test MIDI Device II 5");
-    assert(MIDIDevice.makeChannelName("Test MIDI Device II 8") === "Test MIDI Device II 8");
-    assert(MIDIDevice.makeChannelName("Test MIDI Device II") === "Test MIDI Device II 9");
   });
 });

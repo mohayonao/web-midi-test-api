@@ -8,14 +8,12 @@ describe("usecase", () => {
   it("midi-in", () => {
     const api = new WebMIDITestAPI();
     const device = api.createMIDIDevice();
-    const requestMIDIAccess = api.requestMIDIAccess;
-    let input, onmidimessage;
+    let input;
 
-    return requestMIDIAccess().then((access) => {
+    return api.requestMIDIAccess().then((access) => {
       input = access.inputs.values().next().value;
-      onmidimessage = sinon.spy();
 
-      input.onmidimessage = onmidimessage;
+      input.onmidimessage = sinon.spy();
 
       return input.open();
     }).then(() => {
@@ -23,29 +21,31 @@ describe("usecase", () => {
 
       return device.outputs[0].send([ 0x90, 0x00, 0x00 ]);
     }).then(() => {
-      assert(onmidimessage.calledOnce);
-      assert.deepEqual(onmidimessage.args[0][0].data, new Uint8Array([ 0x90, 0x00, 0x00 ]));
-      onmidimessage.reset();
-    }).then(() => {
+      assert(input.onmidimessage.callCount === 1);
+
+      const message = input.onmidimessage.args[0][0].data;
+
+      assert.deepEqual(message, new Uint8Array([ 0x90, 0x00, 0x00 ]));
+
+      input.onmidimessage.reset();
+
       return input.close();
     }).then(() => {
       assert(input.connection === "closed");
 
       return device.outputs[0].send([ 0x90, 0x00, 0x00 ]);
     }).then(() => {
-      assert(!onmidimessage.called);
+      assert(input.onmidimessage.callCount === 0);
     });
   });
   it("midi-out", () => {
     const api = new WebMIDITestAPI();
     const device = api.createMIDIDevice();
-    const requestMIDIAccess = api.requestMIDIAccess;
-    const onmidimessage = sinon.spy();
     let output;
 
-    device.inputs[0].onmidimessage = onmidimessage;
+    device.inputs[0].onmidimessage = sinon.spy();
 
-    return requestMIDIAccess().then((access) => {
+    return api.requestMIDIAccess().then((access) => {
       output = access.outputs.values().next().value;
 
       return output.open();
@@ -54,9 +54,13 @@ describe("usecase", () => {
 
       return output.send([ 0x90, 0x00, 0x00 ]);
     }).then(() => {
-      assert(onmidimessage.calledOnce);
-      assert.deepEqual(onmidimessage.args[0][0].data, new Uint8Array([ 0x90, 0x00, 0x00 ]));
-      onmidimessage.reset();
+      assert(device.inputs[0].onmidimessage.callCount === 1);
+
+      const message = device.inputs[0].onmidimessage.args[0][0].data;
+
+      assert.deepEqual(message, new Uint8Array([ 0x90, 0x00, 0x00 ]));
+
+      device.inputs[0].onmidimessage.reset();
     }).then(() => {
       return output.close();
     }).then(() => {
@@ -64,7 +68,7 @@ describe("usecase", () => {
 
       return output.send([ 0x90, 0x00, 0x00 ]);
     }).then(() => {
-      assert(!onmidimessage.called);
+      assert(device.inputs[0].onmidimessage.callCount === 0);
     });
   });
 });

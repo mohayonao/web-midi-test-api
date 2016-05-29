@@ -17,16 +17,16 @@ class WebMIDITestAPI extends events.EventEmitter {
     this._devices = [];
   }
 
+  get devices() {
+    return this._devices.slice();
+  }
+
   get inputs() {
-    return this._devices.reduce((a, b) => {
-      return a.concat(b.inputs);
-    }, []);
+    return this._devices.reduce((a, b) => a.concat(b.inputs), []);
   }
 
   get outputs() {
-    return this._devices.reduce((a, b) => {
-      return a.concat(b.outputs);
-    }, []);
+    return this._devices.reduce((a, b) => a.concat(b.outputs), []);
   }
 
   createMIDIDevice(opts) {
