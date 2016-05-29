@@ -1,15 +1,19 @@
-import EventEmitter from "./EventEmitter";
-import util from "./util";
+"use strict";
+
+const events = require("events");
+const util = require("./util");
 
 let MidiPortIndex = 0;
 let ChannelNames = {};
 
-export class MIDIDevice extends EventEmitter {
-  constructor(opts = {}) {
+class MIDIDevice extends events.EventEmitter {
+  constructor(opts) {
+    opts = opts || {};
+
     super();
 
-    let numberOfInputs = util.defaults(opts.numberOfInputs, 1);
-    let numberOfOutputs = util.defaults(opts.numberOfOutputs, 1);
+    const numberOfInputs = util.defaults(opts.numberOfInputs, 1);
+    const numberOfOutputs = util.defaults(opts.numberOfOutputs, 1);
 
     this._manufacturer = util.defaults(opts.manufacturer, "");
     this._name = util.defaults(opts.name, "Web MIDI Test API");
@@ -80,7 +84,7 @@ export class MIDIDevice extends EventEmitter {
   }
 }
 
-export class MIDIDeviceMessageChannel extends EventEmitter {
+class MIDIDeviceMessageChannel extends events.EventEmitter {
   constructor(device) {
     super();
 
@@ -109,8 +113,9 @@ export class MIDIDeviceMessageChannel extends EventEmitter {
     return this.device.state;
   }
 }
+MIDIDevice.MessageChannel = MIDIDeviceMessageChannel;
 
-export class MIDIDeviceMessagePort extends EventEmitter {
+class MIDIDeviceMessagePort extends events.EventEmitter {
   constructor(channel, type) {
     super();
 
@@ -167,16 +172,18 @@ export class MIDIDeviceMessagePort extends EventEmitter {
     if (this.target !== null && this.state === "connected") {
       this.target.emit("midimessage", {
         receivedTime: util.defaults(timestamp, Date.now()),
-        data: new Uint8Array(data),
+        data: new Uint8Array(data)
       });
     }
   }
 
   clear() {}
 }
+MIDIDevice.MessagePort = MIDIDeviceMessagePort;
 
-export function makeChannelName(deviceName) {
-  let m = /^(.+?)\s*(\d+)$/.exec(deviceName);
+function makeChannelName(deviceName) {
+  const m = /^(.+?)\s*(\d+)$/.exec(deviceName);
+
   let name, index, result;
 
   if (m === null) {
@@ -199,5 +206,6 @@ export function makeChannelName(deviceName) {
 
   return result;
 }
+MIDIDevice.makeChannelName = makeChannelName;
 
-export default MIDIDevice;
+module.exports = MIDIDevice;

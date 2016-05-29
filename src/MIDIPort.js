@@ -1,4 +1,6 @@
-import EventEmitter from "./EventEmitter";
+"use strict";
+
+const events = require("events");
 
 // interface MIDIPort : EventTarget {
 //   readonly  attribute DOMString               id;
@@ -13,7 +15,7 @@ import EventEmitter from "./EventEmitter";
 //   Promise<MIDIPort> close();
 // };
 
-export default class MIDIPort extends EventEmitter {
+class MIDIPort extends events.EventEmitter {
   constructor(access, port) {
     super();
 
@@ -99,7 +101,8 @@ export default class MIDIPort extends EventEmitter {
       if (this.state === "disconnected") {
         this._connection = "pending";
 
-        let event = { port: this };
+        const event = { port: this };
+
         this.$access.emit("statechange", event);
         this.emit("statechange", event);
 
@@ -109,7 +112,8 @@ export default class MIDIPort extends EventEmitter {
       return this._open().then(() => {
         this._connection = "open";
 
-        let event = { port: this };
+        const event = { port: this };
+
         this.$access.emit("statechange", event);
         this.emit("statechange", event);
 
@@ -127,7 +131,8 @@ export default class MIDIPort extends EventEmitter {
       return this._close().then(() => {
         this._connection = "closed";
 
-        let event = { port: this };
+        const event = { port: this };
+
         this.$access.emit("statechange", event);
         this.emit("statechange", event);
 
@@ -143,3 +148,5 @@ export default class MIDIPort extends EventEmitter {
     return Promise.resolve(this);
   }
 }
+
+module.exports = MIDIPort;

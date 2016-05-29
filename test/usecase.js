@@ -1,12 +1,14 @@
-import assert from "power-assert";
-import sinon from "sinon";
-import WebMIDITestAPI from "../src";
+"use strict";
+
+const assert = require("power-assert");
+const sinon = require("sinon");
+const WebMIDITestAPI = require("../src");
 
 describe("usecase", () => {
   it("midi-in", () => {
-    let api = new WebMIDITestAPI();
-    let device = api.createMIDIDevice();
-    let { requestMIDIAccess } = api;
+    const api = new WebMIDITestAPI();
+    const device = api.createMIDIDevice();
+    const requestMIDIAccess = api.requestMIDIAccess;
     let input, onmidimessage;
 
     return requestMIDIAccess().then((access) => {
@@ -35,10 +37,11 @@ describe("usecase", () => {
     });
   });
   it("midi-out", () => {
-    let api = new WebMIDITestAPI();
-    let device = api.createMIDIDevice();
-    let { requestMIDIAccess } = api;
-    let output, onmidimessage = sinon.spy();
+    const api = new WebMIDITestAPI();
+    const device = api.createMIDIDevice();
+    const requestMIDIAccess = api.requestMIDIAccess;
+    const onmidimessage = sinon.spy();
+    let output;
 
     device.inputs[0].onmidimessage = onmidimessage;
 

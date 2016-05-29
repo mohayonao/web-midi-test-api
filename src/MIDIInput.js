@@ -1,10 +1,12 @@
-import MIDIPort from "./MIDIPort";
+"use strict";
+
+const MIDIPort = require("./MIDIPort");
 
 // interface MIDIInput : MIDIPort {
 //   attribute EventHandler onmidimessage;
 // };
 
-export default class MIDIInput extends MIDIPort {
+class MIDIInput extends MIDIPort {
   constructor(access, port) {
     super(access, port);
 
@@ -28,3 +30,5 @@ export default class MIDIInput extends MIDIPort {
     }
   }
 }
+
+module.exports = MIDIInput;

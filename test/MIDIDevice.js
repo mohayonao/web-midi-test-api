@@ -1,18 +1,19 @@
-import assert from "power-assert";
-import sinon from "sinon";
-import EventEmitter from "../src/EventEmitter";
-import { MIDIDevice, MIDIDeviceMessageChannel, MIDIDeviceMessagePort, makeChannelName } from "../src/MIDIDevice";
+"use strict";
+
+const assert = require("power-assert");
+const sinon = require("sinon");
+const events = require("events");
+const MIDIDevice = require("../src/MIDIDevice");
 
 describe("MIDIDevice", () => {
   describe("constructor(opts = {})", () => {
-    let device = new MIDIDevice();
+    const device = new MIDIDevice();
 
-    assert(device instanceof EventEmitter);
     assert(device instanceof MIDIDevice);
   });
   describe("#state: string", () => {
     it("works", () => {
-      let device = new MIDIDevice();
+      const device = new MIDIDevice();
 
       assert(device.state === "connected");
 
@@ -25,44 +26,44 @@ describe("MIDIDevice", () => {
   });
   describe("#numberOfInputs: number", () => {
     it("works", () => {
-      let device = new MIDIDevice();
+      const device = new MIDIDevice();
 
       assert(device.numberOfInputs === 1);
     });
   });
   describe("#numberOfOutputs: number", () => {
     it("works", () => {
-      let device = new MIDIDevice();
+      const device = new MIDIDevice();
 
       assert(device.numberOfOutputs === 1);
     });
   });
   describe("#inputs: MIDIDeviceMessagePort[]", () => {
     it("works", () => {
-      let device = new MIDIDevice({ numberOfInputs: 2 });
+      const device = new MIDIDevice({ numberOfInputs: 2 });
 
       assert(device.inputs !== device.inputs);
       assert.deepEqual(device.inputs, device.inputs);
       assert(device.inputs[0] !== device.inputs[1]);
-      assert(device.inputs[0] instanceof MIDIDeviceMessagePort);
-      assert(device.inputs[1] instanceof MIDIDeviceMessagePort);
+      assert(device.inputs[0] instanceof MIDIDevice.MessagePort);
+      assert(device.inputs[1] instanceof MIDIDevice.MessagePort);
     });
   });
   describe("#outputs: MIDIDeviceMessagePort[]", () => {
     it("works", () => {
-      let device = new MIDIDevice({ numberOfOutputs: 2 });
+      const device = new MIDIDevice({ numberOfOutputs: 2 });
 
       assert(device.outputs !== device.outputs);
       assert.deepEqual(device.outputs, device.outputs);
       assert(device.outputs[0] !== device.outputs[1]);
-      assert(device.outputs[0] instanceof MIDIDeviceMessagePort);
-      assert(device.outputs[1] instanceof MIDIDeviceMessagePort);
+      assert(device.outputs[0] instanceof MIDIDevice.MessagePort);
+      assert(device.outputs[1] instanceof MIDIDevice.MessagePort);
     });
   });
   describe("#connect(): void", () => {
     it("works", () => {
-      let device = new MIDIDevice();
-      let onconnected = sinon.spy();
+      const device = new MIDIDevice();
+      const onconnected = sinon.spy();
 
       device.on("connected", onconnected);
       device.disconnect();
@@ -78,8 +79,8 @@ describe("MIDIDevice", () => {
   });
   describe("#disconnect(): void", () => {
     it("works", () => {
-      let device = new MIDIDevice();
-      let ondisconnected = sinon.spy();
+      const device = new MIDIDevice();
+      const ondisconnected = sinon.spy();
 
       device.on("disconnected", ondisconnected);
 
@@ -102,23 +103,22 @@ describe("MIDIDeviceMessageChannel", () => {
 
   describe("constructor(device: MIDIDevice)", () => {
     it("works", () => {
-      let channel = new MIDIDeviceMessageChannel(device);
+      const channel = new MIDIDevice.MessageChannel(device);
 
-      assert(channel instanceof MIDIDeviceMessageChannel);
-      assert(channel instanceof EventEmitter);
+      assert(channel instanceof MIDIDevice.MessageChannel);
       assert(channel.device === device);
       assert(typeof channel.id === "string");
       assert(typeof channel.name === "string");
       assert(typeof channel.version === "string");
-      assert(channel.input instanceof MIDIDeviceMessagePort);
-      assert(channel.output instanceof MIDIDeviceMessagePort);
+      assert(channel.input instanceof MIDIDevice.MessagePort);
+      assert(channel.output instanceof MIDIDevice.MessagePort);
       assert(channel.input.target === channel.output);
       assert(channel.output.target === channel.input);
     });
   });
   describe("#state", () => {
     it("works", () => {
-      let channel = new MIDIDeviceMessageChannel(device);
+      const channel = new MIDIDevice.MessageChannel(device);
 
       assert(channel.state === "connected");
 
@@ -137,51 +137,50 @@ describe("MIDIDeviceMessagePort", () => {
 
   describe("constructor(channel: MIDIDeviceMessageChannel)", () => {
     it("works", () => {
-      let port = new MIDIDeviceMessagePort(channel, "input");
+      const port = new MIDIDevice.MessagePort(channel, "input");
 
-      assert(port instanceof MIDIDeviceMessagePort);
-      assert(port instanceof EventEmitter);
+      assert(port instanceof MIDIDevice.MessagePort);
       assert(port.channel === channel);
     });
   });
   describe("#id: string", () => {
     it("works", () => {
-      let port = new MIDIDeviceMessagePort(channel, "input");
+      const port = new MIDIDevice.MessagePort(channel, "input");
 
       assert(port.id === "00000000");
     });
   });
   describe("#manufacturer: string", () => {
     it("works", () => {
-      let port = new MIDIDeviceMessagePort(channel, "input");
+      const port = new MIDIDevice.MessagePort(channel, "input");
 
       assert(port.manufacturer === "manufacturer");
     });
   });
   describe("#name: string", () => {
     it("works", () => {
-      let port = new MIDIDeviceMessagePort(channel, "input");
+      const port = new MIDIDevice.MessagePort(channel, "input");
 
       assert(port.name === "name");
     });
   });
   describe("#type: string", () => {
     it("works", () => {
-      let port = new MIDIDeviceMessagePort(channel, "input");
+      const port = new MIDIDevice.MessagePort(channel, "input");
 
       assert(port.type === "input");
     });
   });
   describe("#version: string", () => {
     it("works", () => {
-      let port = new MIDIDeviceMessagePort(channel, "input");
+      const port = new MIDIDevice.MessagePort(channel, "input");
 
       assert(port.version === "version");
     });
   });
   describe("#state", () => {
     it("works", () => {
-      let port = new MIDIDeviceMessagePort(channel, "input");
+      const port = new MIDIDevice.MessagePort(channel, "input");
 
       assert(port.state === "connected");
 
@@ -191,9 +190,9 @@ describe("MIDIDeviceMessagePort", () => {
   });
   describe("#onmidimessage: EventHandler", () => {
     it("works", () => {
-      let port = new MIDIDeviceMessagePort(channel, "input");
-      let onmidimessage = sinon.spy();
-      let event = {};
+      const port = new MIDIDevice.MessagePort(channel, "input");
+      const onmidimessage = sinon.spy();
+      const event = {};
 
       port.onmidimessage = onmidimessage;
       port.onmidimessage = {};
@@ -204,8 +203,8 @@ describe("MIDIDeviceMessagePort", () => {
       assert(onmidimessage.args[0][0] === event);
     });
     it("null", () => {
-      let port = new MIDIDeviceMessagePort(channel, "input");
-      let event = {};
+      const port = new MIDIDevice.MessagePort(channel, "input");
+      const event = {};
 
       port.onmidimessage = null;
       port.onmidimessage = {};
@@ -218,10 +217,10 @@ describe("MIDIDeviceMessagePort", () => {
   });
   describe("#send(data: number[], timestamp: number): void", () => {
     it("works", () => {
-      let port = new MIDIDeviceMessagePort(channel, "input");
-      let onmidimessage = sinon.spy();
+      const port = new MIDIDevice.MessagePort(channel, "input");
+      const onmidimessage = sinon.spy();
 
-      port.target = new EventEmitter();
+      port.target = new events.EventEmitter();
       port.target.on("midimessage", onmidimessage);
 
       port.send([ 0x90, 0x30, 0x64 ]);
@@ -244,7 +243,7 @@ describe("MIDIDeviceMessagePort", () => {
   });
   describe("#clear(): void", () => {
     it("works", () => {
-      let port = new MIDIDeviceMessagePort(channel, "input");
+      const port = new MIDIDevice.MessagePort(channel, "input");
 
       assert.doesNotThrow(() => {
         port.clear();
@@ -255,13 +254,13 @@ describe("MIDIDeviceMessagePort", () => {
 
 describe("makeChannelName(deviceName: string): string", () => {
   it("works", () => {
-    assert(makeChannelName("Test MIDI Device") === "Test MIDI Device");
-    assert(makeChannelName("Test MIDI Device") === "Test MIDI Device 2");
-    assert(makeChannelName("Test MIDI Device") === "Test MIDI Device 3");
+    assert(MIDIDevice.makeChannelName("Test MIDI Device") === "Test MIDI Device");
+    assert(MIDIDevice.makeChannelName("Test MIDI Device") === "Test MIDI Device 2");
+    assert(MIDIDevice.makeChannelName("Test MIDI Device") === "Test MIDI Device 3");
 
-    assert(makeChannelName("Test MIDI Device II 4") === "Test MIDI Device II 4");
-    assert(makeChannelName("Test MIDI Device II") === "Test MIDI Device II 5");
-    assert(makeChannelName("Test MIDI Device II 8") === "Test MIDI Device II 8");
-    assert(makeChannelName("Test MIDI Device II") === "Test MIDI Device II 9");
+    assert(MIDIDevice.makeChannelName("Test MIDI Device II 4") === "Test MIDI Device II 4");
+    assert(MIDIDevice.makeChannelName("Test MIDI Device II") === "Test MIDI Device II 5");
+    assert(MIDIDevice.makeChannelName("Test MIDI Device II 8") === "Test MIDI Device II 8");
+    assert(MIDIDevice.makeChannelName("Test MIDI Device II") === "Test MIDI Device II 9");
   });
 });

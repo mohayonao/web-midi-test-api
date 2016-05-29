@@ -1,53 +1,53 @@
-import assert from "power-assert";
-import EventEmitter from "../src/EventEmitter";
-import WebMIDITestAPI from "../src/WebMIDITestAPI";
-import MIDIAccess from "../src/MIDIAccess";
-import MIDIDevice from "../src/MIDIDevice";
+"use strict";
+
+const assert = require("power-assert");
+const WebMIDITestAPI = require("../src/WebMIDITestAPI");
+const MIDIAccess = require("../src/MIDIAccess");
+const MIDIDevice = require("../src/MIDIDevice");
 
 describe("WebMIDITestAPI", () => {
   describe("constructor()", () => {
     it("works", () => {
-      let api = new WebMIDITestAPI();
+      const api = new WebMIDITestAPI();
 
-      assert(api instanceof EventEmitter);
       assert(api instanceof WebMIDITestAPI);
       assert(typeof api.requestMIDIAccess === "function");
     });
   });
   describe("#inputs: MIDIDeviceMessagePort[]", () => {
     it("works", () => {
-      let api = new WebMIDITestAPI();
+      const api = new WebMIDITestAPI();
 
       assert.deepEqual(api.inputs, []);
     });
   });
   describe("#outputs: MIDIDeviceMessagePort[]", () => {
     it("works", () => {
-      let api = new WebMIDITestAPI();
+      const api = new WebMIDITestAPI();
 
       assert.deepEqual(api.outputs, []);
     });
   });
   describe("#createMIDIDevice(opts: any): MIDIDevice", () => {
     it("works", () => {
-      let api = new WebMIDITestAPI();
-      let device = api.createMIDIDevice();
+      const api = new WebMIDITestAPI();
+      const device = api.createMIDIDevice();
 
       assert(device instanceof MIDIDevice);
     });
   });
   describe("#requestMIDIAccess(opts: any): Promise<MIDIAccess>", () => {
     it("works", () => {
-      let api = new WebMIDITestAPI();
-      let navigator = { requestMIDIAccess: api.requestMIDIAccess };
+      const api = new WebMIDITestAPI();
+      const navigator = { requestMIDIAccess: api.requestMIDIAccess };
 
       return Promise.all([
         api.requestMIDIAccess(),
-        navigator.requestMIDIAccess(),
-      ]).then(([ access1, access2 ]) => {
-        assert(access1 !== access2);
-        assert(access1 instanceof MIDIAccess);
-        assert(access1 instanceof MIDIAccess);
+        navigator.requestMIDIAccess()
+      ]).then((items) => {
+        assert(items[0] !== items[1]);
+        assert(items[0] instanceof MIDIAccess);
+        assert(items[1] instanceof MIDIAccess);
       });
     });
   });

@@ -1,5 +1,7 @@
-import assert from "power-assert";
-import util from "../src/util";
+"use strict";
+
+const assert = require("power-assert");
+const util = require("../src/util");
 
 describe("util", () => {
   describe("convertMIDIMessageToString(data: any): string", () => {

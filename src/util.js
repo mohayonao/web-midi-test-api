@@ -1,22 +1,24 @@
-export function convertMIDIMessageToString(data) {
+"use strict";
+
+function convertMIDIMessageToString(data) {
   if (!data || typeof data.length !== "number") {
     return dec2hex(data);
   }
   return "[" + Array.prototype.slice.call(data).map(dec2hex).join(",") + "]";
 }
 
-export function dec2hex(value) {
+function dec2hex(value) {
   if (typeof value === "number" && isFinite(value)) {
     return "0x" + ((value|0).toString(16)).substr(-2);
   }
   return "NaN";
 }
 
-export function defaults(value, defaultValue) {
+function defaults(value, defaultValue) {
   return value !== undefined ? value : defaultValue;
 }
 
-export function validateMidiMessage(data) {
+function validateMidiMessage(data) {
   if (!data || (!Array.isArray(data) && !(data.buffer instanceof ArrayBuffer))) {
     return false;
   }
@@ -42,9 +44,4 @@ export function validateMidiMessage(data) {
   return false;
 }
 
-export default {
-  convertMIDIMessageToString,
-  dec2hex,
-  defaults,
-  validateMidiMessage,
-};
+module.exports = { convertMIDIMessageToString, dec2hex, defaults, validateMidiMessage };
