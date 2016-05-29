@@ -7,19 +7,25 @@
     "url": "https://github.com/mohayonao/web-midi-test-api/issues"
   },
   "devDependencies": {
-    "babel": "^5.5.8",
-    "babel-eslint": "^3.1.17",
-    "eslint": "^0.23.0",
-    "espower-babel": "^3.2.0",
-    "isparta": "^3.0.3",
-    "mocha": "^2.2.5",
-    "power-assert": "^0.11.0",
-    "sinon": "^1.15.3"
+    "babel-cli": "^6.9.0",
+    "babel-plugin-unassert": "^2.1.0",
+    "babel-preset-es2015": "^6.9.0",
+    "babel-preset-power-assert": "^1.0.0",
+    "babel-register": "^6.9.0",
+    "deep-equal": "^1.0.1",
+    "eslint": "^2.11.0",
+    "eslint-plugin-node": "^1.4.0",
+    "mocha": "^2.5.3",
+    "npm-run-all": "^2.1.1",
+    "nyc": "^6.4.4",
+    "power-assert": "^1.4.1",
+    "sinon": "^1.17.4"
   },
   "files": [
     "package.json",
     "README.md",
     "index.js",
+    "src",
     "lib"
   ],
   "homepage": "https://github.com/mohayonao/web-midi-test-api/",
@@ -27,18 +33,27 @@
     "midi",
     "test"
   ],
+  "engines": {
+    "node": ">= 4.0.0"
+  },
   "license": "MIT",
-  "main": "./index.js",
+  "main": "lib",
   "repository": {
     "type": "git",
     "url": "https://github.com/mohayonao/web-midi-test-api.git"
   },
   "scripts": {
-    "build": "babel src --out-dir lib",
-    "cover": "babel-node $(npm bin)/isparta cover --report text --report html --report lcov _mocha",
+    "build": "npm-run-all build:*",
+    "build:to5": "BABEL_ENV=production babel --out-dir=lib src",
+    "clean": "rm -rf lib coverage .nyc_output npm-debug.log",
+    "cover": "BABEL_ENV=coverage nyc --reporter text --reporter html mocha --require babel-register",
     "lint": "eslint src test",
-    "prepublish": "rm -rf lib && npm run lint && npm run test && npm run build",
-    "test": "mocha --compilers js:espower-babel/guess",
-    "travis": "npm run lint && npm run cover"
+    "mocha": "mocha",
+    "postversion": "git push && git push --tags && npm run clean",
+    "prepublish": "npm-run-all clean lint test build",
+    "preversion": "npm-run-all clean lint test",
+    "test": "mocha --require babel-register",
+    "travis": "npm-run-all lint mocha",
+    "version": "npm run build && git add -A build"
   }
 }
