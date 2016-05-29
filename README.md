@@ -1,8 +1,9 @@
 # web-midi-test-api
+[![Build Status](http://img.shields.io/travis/mohayonao/web-midi-test-api.svg?style=flat-square)](https://travis-ci.org/mohayonao/web-midi-test-api)
+[![NPM Version](http://img.shields.io/npm/v/web-midi-test-api.svg?style=flat-square)](https://www.npmjs.org/package/web-midi-test-api)
+[![License](http://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](http://mohayonao.mit-license.org/)
 
 > Web MIDI API for CI
-
-:zap: WIP
 
 ## API
 ### WebMIDITestAPI
@@ -10,7 +11,19 @@
 
 #### Instance methods
 - `requestMIDIAccess(opts = {}): Promise<MIDIAccess>`
+  - `opts.sysex: boolean`
 - `createMIDIDevice(opts = {}): MIDIDevice`
+  - create a mock MIDI instrument and register it to api
+  - `opts.numberOfInputs: number` number of input MIDI ports - _default: **1**_
+  - `opts.numberOfOutputs: number` number of output MIDI ports - _default: **1**_
+  - `opts.manufacturer: string` _default: **""**_
+  - `opts.name: string` _default: **"Web MIDI Test API"**_
+- `devices: MIDIDevice[]`
+  - all registered MIDIDevices
+- `inputs: MIDIPort[]`
+  - all registered input MIDIPorts
+- `outputs: MIDIPort[]`
+  - all registered output MIDIPorts
 
 ### MIDIDevice
 `MIDIDevice` is a mock of MIDI instrument (e.g. hardware/software synthesizer or DAW).
@@ -29,68 +42,89 @@
 - `connect(): void`
 - `disconnect(): void`
 
-## Usage
-MIDI-IN
-```js
-var api = new WebMIDITestAPI();
-var device = api.createMIDIDevice();
-var input;
+### MIDIPort
+`MIDIPort` is a mock of MIDI messaging port.
 
-api.requestMIDIAccess().then(function(access) {
+#### Instance attributes
+- `id: string`
+- `manufacturer: string`
+- `name: string`
+- `type: string` ("input" or "output")
+- `version: string`
+- `state: string`
+- `onmidimessage: function`
+
+#### Instance methods
+- `send(data: number[], [timestamp: number]): void`
+
+## Usage
+
+MIDI-IN (test mock -> WebMIDIAPI)
+
+```js
+const api = new WebMIDITestAPI();
+const device = api.createMIDIDevice();
+let input;
+
+api.requestMIDIAccess().then((access) => {
   input = access.inputs.values().next().value;
 
   input.onmidimessage = sinon.spy();
 
   return input.open();
-}).then(function() {
+}).then(() => {
+  assert(input.connection === "open");
+
   return device.outputs[0].send([ 0x90, 0x30, 0x64 ]);
-}).then(function() {
-  var message = input.onmidimessage.args[0][0].data;
+}).then(() => {
+  const message = input.onmidimessage.args[0][0].data;
 
   assert.deepEqual(message, new Uint8Array([ 0x90, 0x30, 0x64 ]));
 });
 ```
 
-MIDI-OUT
+MIDI-OUT (WebMIDIAPI -> test mock)
+
 ```js
-var api = new WebMIDITestAPI();
-var device = api.createMIDIDevice();
-var output;
+const api = new WebMIDITestAPI();
+const device = api.createMIDIDevice();
+let output;
 
 device.inputs[0].onmidimessage = sinon.spy();
 
-api.requestMIDIAccess().then(function(access) {
+api.requestMIDIAccess().then((access) => {
   output = access.outputs.values().next().value;
 
   return output.open();
-}).then(function() {
-  return output.send([ 0x90, 0x30, 0x64 ]);
-}).then(function() {
-  var message = device.inputs[0].onmidimessage.args[0][0].data;
+}).then(() => {
+  return output.send([ 0x90, 0x00, 0x00 ]);
+}).then(() => {
+  const message = device.inputs[0].onmidimessage.args[0][0].data;
 
-  assert.deepEqual(message, new Uint8Array([ 0x90, 0x30, 0x64 ]));
+  assert.deepEqual(message, new Uint8Array([ 0x90, 0x00, 0x00 ]));
 });
 ```
 
 STATE CHANGE
-```js
-var api = new WebMIDITestAPI();
-var device = api.createMIDIDevice();
-var input;
 
-api.requestMIDIAccess().then(function(access) {
+```js
+const api = new WebMIDITestAPI();
+const device = api.createMIDIDevice();
+let input;
+
+api.requestMIDIAccess().then((access) => {
   input = access.inputs.values().next().value;
 
   assert(input.state === "connected");
   assert(input.connection === "closed");
 
   return input.open();
-}).then(function() {
+}).then(() => {
   assert(input.state === "connected");
   assert(input.connection === "open");
 
   return device.disconnect();
-}).then(function() {
+}).then(() => {
   assert(input.state === "disconnected");
   assert(input.connection === "closed");
 
@@ -102,4 +136,5 @@ api.requestMIDIAccess().then(function(access) {
 ```
 
 ## License
+
 MIT
