@@ -25,7 +25,7 @@ class MIDIInput extends MIDIPort {
     if (callback === null || typeof callback === "function") {
       this._onmidimessage = callback;
       if (callback && this.connection !== "open") {
-        this.open();
+        this._implicitOpen();
       }
     }
   }

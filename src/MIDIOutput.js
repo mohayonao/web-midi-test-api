@@ -16,6 +16,9 @@ class MIDIOutput extends MIDIPort {
     if ((data[0] & 0xf0) === 0xf0 && !this.$access.sysexEnabled) {
       throw new Error("System exclusive message is not allowed");
     }
+    if (this.connection !== "open") {
+      this._implicitOpen();
+    }
     if (this.connection === "open") {
       this.$port.send(data, timestamp);
     }

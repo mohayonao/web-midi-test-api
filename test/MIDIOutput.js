@@ -5,12 +5,13 @@ const MIDIAccess = require("../src/MIDIAccess");
 const MIDIPort = require("../src/MIDIPort");
 const MIDIOutput = require("../src/MIDIOutput");
 const MIDIDevice = require("../src/MIDIDevice");
+const events = require('events');
 
 describe("MIDIOutput", () => {
   let access, port;
 
   beforeEach(() => {
-    access = new MIDIAccess({});
+    access = new MIDIAccess(new events.EventEmitter());
     port = new MIDIDevice.MessagePort({}, "output");
   });
 
@@ -49,7 +50,7 @@ describe("MIDIOutput", () => {
       }, Error);
     });
     it("sysex: true", () => {
-      const access = new MIDIAccess({}, { sysex: true });
+      const access = new MIDIAccess(new events.EventEmitter(), { sysex: true });
       const output = new MIDIOutput(access, port);
 
       assert.doesNotThrow(() => {

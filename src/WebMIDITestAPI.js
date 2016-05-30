@@ -33,6 +33,8 @@ class WebMIDITestAPI extends events.EventEmitter {
     const device = new MIDIDevice(opts);
 
     this._devices.push(device);
+    
+    this.emit('statechange');
 
     return device;
   }

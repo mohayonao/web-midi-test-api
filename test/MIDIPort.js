@@ -5,12 +5,13 @@ const sinon = require("sinon");
 const MIDIAccess = require("../src/MIDIAccess");
 const MIDIPort = require("../src/MIDIPort");
 const MIDIDevice = require("../src/MIDIDevice");
+const events = require('events');
 
 describe("MIDIPort", () => {
   let access, device, port;
 
   beforeEach(() => {
-    access = new MIDIAccess({});
+    access = new MIDIAccess(new events.EventEmitter());
     device = new MIDIDevice();
     port = device.inputs[0];
   });

@@ -24,14 +24,15 @@ class MIDIAccess extends events.EventEmitter {
         this._onstatechange.call(this, e);
       }
     });
+    this.$api.on("statechange", e => this.emit("statechange", e));
   }
 
   get inputs() {
-    return new Map(this.$api.outputs.map(port => [ port.name, new MIDIInput(this, port.target) ]));
+    return new Map(this.$api.outputs.map(port => [ port.id, new MIDIInput(this, port.target) ]));
   }
 
   get outputs() {
-    return new Map(this.$api.inputs.map(port => [ port.name, new MIDIOutput(this, port.target) ]));
+    return new Map(this.$api.inputs.map(port => [ port.id, new MIDIOutput(this, port.target) ]));
   }
 
   get onstatechange() {
