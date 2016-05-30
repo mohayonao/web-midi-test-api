@@ -24,6 +24,7 @@ class MIDIAccess extends events.EventEmitter {
         this._onstatechange.call(this, e);
       }
     });
+    this.$api.on("statechange", e => this.emit("statechange", e));
   }
 
   get inputs() {
