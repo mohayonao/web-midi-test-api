@@ -68,7 +68,8 @@ describe("usecase", () => {
 
       return output.send([ 0x90, 0x00, 0x00 ]);
     }).then(() => {
-      assert(device.inputs[0].onmidimessage.callCount === 0);
+      assert(output.connection === "open");
+      assert(device.inputs[0].onmidimessage.callCount === 1);
     });
   });
 });

@@ -6,12 +6,13 @@ const MIDIAccess = require("../src/MIDIAccess");
 const MIDIPort = require("../src/MIDIPort");
 const MIDIInput = require("../src/MIDIInput");
 const MIDIDevice = require("../src/MIDIDevice");
+const events = require('events');
 
 describe("MIDIInput", () => {
   let access, port;
 
   beforeEach(() => {
-    access = new MIDIAccess({});
+    access = new MIDIAccess(new events.EventEmitter());
     port = new MIDIDevice.MessagePort({}, "input");
   });
 
