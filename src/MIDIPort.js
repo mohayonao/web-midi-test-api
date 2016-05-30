@@ -96,31 +96,12 @@ class MIDIPort extends events.EventEmitter {
 
   open() {
     return new Promise((resolve, reject) => {
-      if (this.connection === "open" || this.connection === "pending") {
-        return resolve(this);
-      }
-
-      if (this.state === "disconnected") {
-        this._connection = "pending";
-
-        const event = { port: this };
-
-        this.$access.emit("statechange", event);
-        this.emit("statechange", event);
-
-        return resolve(this);
-      }
-
-      return this._open().then(() => {
-        this._connection = "open";
-
-        const event = { port: this };
-
-        this.$access.emit("statechange", event);
-        this.emit("statechange", event);
-
+      try {
+        this._implicitOpen();
         resolve(this);
-      }, reject);
+      } catch(e) {
+        reject(e);
+      }
     });
   }
 
@@ -148,6 +129,30 @@ class MIDIPort extends events.EventEmitter {
   }
   _close() {
     return Promise.resolve(this);
+  }
+  
+  _implicitOpen() {
+      if (this.connection === "open" || this.connection === "pending") {
+        return;
+      }
+
+      if (this.state === "disconnected") {
+        this._connection = "pending";
+
+        const event = { port: this };
+
+        this.$access.emit("statechange", event);
+        this.emit("statechange", event);
+
+        return;
+      }
+
+      this._connection = "open";
+
+      const event = { port: this };
+
+      this.$access.emit("statechange", event);
+      this.emit("statechange", event);
   }
 }
 
