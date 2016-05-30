@@ -1,21 +1,23 @@
-import assert from "power-assert";
-import sinon from "sinon";
-import MIDIAccess from "../src/MIDIAccess";
-import MIDIPort from "../src/MIDIPort";
-import MIDIInput from "../src/MIDIInput";
-import { MIDIDeviceMessagePort } from "../src/MIDIDevice";
+"use strict";
+
+const assert = require("power-assert");
+const sinon = require("sinon");
+const MIDIAccess = require("../src/MIDIAccess");
+const MIDIPort = require("../src/MIDIPort");
+const MIDIInput = require("../src/MIDIInput");
+const MIDIDevice = require("../src/MIDIDevice");
 
 describe("MIDIInput", () => {
   let access, port;
 
   beforeEach(() => {
     access = new MIDIAccess({});
-    port = new MIDIDeviceMessagePort({}, "input");
+    port = new MIDIDevice.MessagePort({}, "input");
   });
 
-  describe("constructor(access: MIDIAccess, port: MIDIDeviceMessagePort)", () => {
+  describe("constructor(access: MIDIAccess, port: MIDIDevice.MessagePort)", () => {
     it("works", () => {
-      let input = new MIDIInput(access, port);
+      const input = new MIDIInput(access, port);
 
       assert(input instanceof MIDIPort);
       assert(input instanceof MIDIInput);
@@ -23,16 +25,16 @@ describe("MIDIInput", () => {
   });
   describe("#type: string", () => {
     it("works", () => {
-      let input = new MIDIInput(access, port);
+      const input = new MIDIInput(access, port);
 
       assert(input.type === "input");
     });
   });
   describe("#onmidimessage: EventHandler", () => {
     it("works", () => {
-      let input = new MIDIInput(access, port);
-      let onmidimessage = sinon.spy();
-      let event = {};
+      const input = new MIDIInput(access, port);
+      const onmidimessage = sinon.spy();
+      const event = {};
 
       input.onmidimessage = onmidimessage;
       input.onmidimessage = {};
@@ -53,8 +55,8 @@ describe("MIDIInput", () => {
       });
     });
     it("null", () => {
-      let input = new MIDIInput(access, port);
-      let event = {};
+      const input = new MIDIInput(access, port);
+      const event = {};
 
       input.onmidimessage = null;
       input.onmidimessage = {};

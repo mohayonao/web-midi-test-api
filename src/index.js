@@ -1,3 +1,1 @@
-import WebMIDITestAPI from "./WebMIDITestAPI";
-
-export default WebMIDITestAPI;
+module.exports = require("./WebMIDITestAPI");

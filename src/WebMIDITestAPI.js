@@ -1,12 +1,14 @@
-import EventEmitter from "./EventEmitter";
-import MIDIAccess from "./MIDIAccess";
-import MIDIDevice from "../src/MIDIDevice";
+"use strict";
+
+const events = require("events");
+const MIDIAccess = require("./MIDIAccess");
+const MIDIDevice = require("../src/MIDIDevice");
 
 // partial interface Navigator {
 //   Promise<MIDIAccess> requestMIDIAccess(optional MIDIOptions options);
 // };
 
-export default class WebMIDITestAPI extends EventEmitter {
+class WebMIDITestAPI extends events.EventEmitter {
   constructor() {
     super();
 
@@ -15,20 +17,20 @@ export default class WebMIDITestAPI extends EventEmitter {
     this._devices = [];
   }
 
+  get devices() {
+    return this._devices.slice();
+  }
+
   get inputs() {
-    return this._devices.reduce((a, b) => {
-      return a.concat(b.inputs);
-    }, []);
+    return this._devices.reduce((a, b) => a.concat(b.inputs), []);
   }
 
   get outputs() {
-    return this._devices.reduce((a, b) => {
-      return a.concat(b.outputs);
-    }, []);
+    return this._devices.reduce((a, b) => a.concat(b.outputs), []);
   }
 
   createMIDIDevice(opts) {
-    let device = new MIDIDevice(opts);
+    const device = new MIDIDevice(opts);
 
     this._devices.push(device);
 
@@ -39,3 +41,5 @@ export default class WebMIDITestAPI extends EventEmitter {
     return Promise.resolve(new MIDIAccess(this, opts));
   }
 }
+
+module.exports = WebMIDITestAPI;

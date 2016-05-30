@@ -1,16 +1,14 @@
-import MIDIPort from "./MIDIPort";
-import util from "./util";
+"use strict";
+
+const MIDIPort = require("./MIDIPort");
+const util = require("./util");
 
 // interface MIDIOutput : MIDIPort {
 //   void send(sequence<octet> data, optional double timestamp);
 //   void clear();
 // };
 
-export default class MIDIOutput extends MIDIPort {
-  constructor(access, port) {
-    super(access, port);
-  }
-
+class MIDIOutput extends MIDIPort {
   send(data, timestamp) {
     if (!util.validateMidiMessage(data)) {
       throw new TypeError("Invalid MIDI message: " + util.convertMIDIMessageToString(data));
@@ -27,3 +25,5 @@ export default class MIDIOutput extends MIDIPort {
     this.$port.clear();
   }
 }
+
+module.exports = MIDIOutput;

@@ -1,29 +1,24 @@
-import EventEmitter from "./EventEmitter";
-import util from "./util";
+"use strict";
+
+const events = require("events");
+const util = require("./util");
 
 let MidiPortIndex = 0;
-let ChannelNames = {};
 
-export class MIDIDevice extends EventEmitter {
-  constructor(opts = {}) {
+class MIDIDevice extends events.EventEmitter {
+  constructor(opts) {
+    opts = opts || {};
+
+    const numberOfInputs = util.defaults(opts.numberOfInputs, 1);
+    const numberOfOutputs = util.defaults(opts.numberOfOutputs, 1);
+
     super();
-
-    let numberOfInputs = util.defaults(opts.numberOfInputs, 1);
-    let numberOfOutputs = util.defaults(opts.numberOfOutputs, 1);
 
     this._manufacturer = util.defaults(opts.manufacturer, "");
     this._name = util.defaults(opts.name, "Web MIDI Test API");
     this._version = util.defaults(opts.version, "");
-    this._inputs = new Array(numberOfInputs);
-    this._outputs = new Array(numberOfOutputs);
-
-    for (let i = 0; i < numberOfInputs; i++) {
-      this._inputs[i] = new MIDIDeviceMessageChannel(this);
-    }
-    for (let i = 0; i < numberOfOutputs; i++) {
-      this._outputs[i] = new MIDIDeviceMessageChannel(this);
-    }
-
+    this._inputs = Array.from({ length: numberOfInputs }, () => new MIDIDevice.MessageChannel(this));
+    this._outputs = Array.from({ length: numberOfOutputs }, () => new MIDIDevice.MessageChannel(this));
     this._state = "connected";
   }
 
@@ -80,17 +75,17 @@ export class MIDIDevice extends EventEmitter {
   }
 }
 
-export class MIDIDeviceMessageChannel extends EventEmitter {
+MIDIDevice.MessageChannel = class MIDIDeviceMessageChannel extends events.EventEmitter {
   constructor(device) {
     super();
 
     this.device = device;
     this.id = "" + (MidiPortIndex++);
     this.manufacturer = this.device.manufacturer;
-    this.name = makeChannelName(device.name);
+    this.name = util.makeChannelName(device.name);
     this.version = this.device.version;
-    this.input = new MIDIDeviceMessagePort(this, "input");
-    this.output = new MIDIDeviceMessagePort(this, "output");
+    this.input = new MIDIDevice.MessagePort(this, "input");
+    this.output = new MIDIDevice.MessagePort(this, "output");
 
     this.input.target = this.output;
     this.output.target = this.input;
@@ -108,9 +103,9 @@ export class MIDIDeviceMessageChannel extends EventEmitter {
   get state() {
     return this.device.state;
   }
-}
+};
 
-export class MIDIDeviceMessagePort extends EventEmitter {
+MIDIDevice.MessagePort = class MIDIDeviceMessagePort extends events.EventEmitter {
   constructor(channel, type) {
     super();
 
@@ -167,37 +162,12 @@ export class MIDIDeviceMessagePort extends EventEmitter {
     if (this.target !== null && this.state === "connected") {
       this.target.emit("midimessage", {
         receivedTime: util.defaults(timestamp, Date.now()),
-        data: new Uint8Array(data),
+        data: new Uint8Array(data)
       });
     }
   }
 
   clear() {}
-}
+};
 
-export function makeChannelName(deviceName) {
-  let m = /^(.+?)\s*(\d+)$/.exec(deviceName);
-  let name, index, result;
-
-  if (m === null) {
-    name = "" + deviceName;
-    index = 1;
-  } else {
-    name = m[1];
-    index = m[2];
-  }
-
-  ChannelNames[name] = Math.max(1, (index|0), ChannelNames[name] || 0);
-
-  if (ChannelNames[name] === 1) {
-    result = name;
-  } else {
-    result = name + " " + ChannelNames[name];
-  }
-
-  ChannelNames[name] += 1;
-
-  return result;
-}
-
-export default MIDIDevice;
+module.exports = MIDIDevice;

@@ -1,6 +1,8 @@
-import EventEmitter from "./EventEmitter";
-import MIDIInput from "./MIDIInput";
-import MIDIOutput from "./MIDIOutput";
+"use strict";
+
+const events = require("events");
+const MIDIInput = require("./MIDIInput");
+const MIDIOutput = require("./MIDIOutput");
 
 // interface MIDIAccess : EventTarget {
 //   readonly  attribute MIDIInputMap  inputs;
@@ -9,7 +11,7 @@ import MIDIOutput from "./MIDIOutput";
 //   readonly  attribute boolean       sysexEnabled;
 // };
 
-export default class MIDIAccess extends EventEmitter {
+class MIDIAccess extends events.EventEmitter {
   constructor(api, opts) {
     super();
 
@@ -46,3 +48,5 @@ export default class MIDIAccess extends EventEmitter {
     return this._sysexEnabled;
   }
 }
+
+module.exports = MIDIAccess;
