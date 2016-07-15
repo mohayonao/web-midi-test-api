@@ -1,12 +1,12 @@
 "use strict";
 
-const events = require("events");
+const EventTarget = require("./EventTarget");
 const util = require("./util");
 
 let MidiPortIndex = 0;
 
-class MIDIDevice extends events.EventEmitter {
-  constructor(opts) {
+class MIDIDevice extends EventTarget {
+  constructor(api, opts) {
     opts = opts || {};
 
     const numberOfInputs = util.defaults(opts.numberOfInputs, 1);
@@ -14,12 +14,17 @@ class MIDIDevice extends events.EventEmitter {
 
     super();
 
+    this._api = api;
     this._manufacturer = util.defaults(opts.manufacturer, "");
     this._name = util.defaults(opts.name, "Web MIDI Test API");
     this._version = util.defaults(opts.version, "");
     this._inputs = Array.from({ length: numberOfInputs }, () => new MIDIDevice.MessageChannel(this));
     this._outputs = Array.from({ length: numberOfOutputs }, () => new MIDIDevice.MessageChannel(this));
-    this._state = "connected";
+    this._state = "disconnected";
+  }
+
+  get api() {
+    return this._api;
   }
 
   get manufacturer() {
@@ -56,6 +61,7 @@ class MIDIDevice extends events.EventEmitter {
 
   connect() {
     if (this._state === "disconnected") {
+      this._api.registerDevice(this);
       this._state = "connected";
       this._inputs.concat(this._outputs).forEach((channel) => {
         channel.emit("connected");
@@ -75,7 +81,7 @@ class MIDIDevice extends events.EventEmitter {
   }
 }
 
-MIDIDevice.MessageChannel = class MIDIDeviceMessageChannel extends events.EventEmitter {
+MIDIDevice.MessageChannel = class MIDIDeviceMessageChannel extends EventTarget {
   constructor(device) {
     super();
 
@@ -105,7 +111,7 @@ MIDIDevice.MessageChannel = class MIDIDeviceMessageChannel extends events.EventE
   }
 };
 
-MIDIDevice.MessagePort = class MIDIDeviceMessagePort extends events.EventEmitter {
+MIDIDevice.MessagePort = class MIDIDeviceMessagePort extends EventTarget {
   constructor(channel, type) {
     super();
 
@@ -113,12 +119,6 @@ MIDIDevice.MessagePort = class MIDIDeviceMessagePort extends events.EventEmitter
     this.target = null;
     this._type = type;
     this._onmidimessage = null;
-
-    this.on("midimessage", (e) => {
-      if (this._onmidimessage !== null) {
-        this._onmidimessage.call(this, e);
-      }
-    });
   }
 
   get id() {

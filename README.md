@@ -6,10 +6,8 @@
 > Web MIDI API for CI
 
 ## API
-### WebMIDITestAPI
-- `constructor()`
 
-#### Instance methods
+#### Static methods
 - `requestMIDIAccess(opts = {}): Promise<MIDIAccess>`
   - `opts.sysex: boolean`
 - `createMIDIDevice(opts = {}): MIDIDevice`
@@ -57,12 +55,12 @@
 #### Instance methods
 - `send(data: number[], [timestamp: number]): void`
 
-## Usage
+## How to use
 
 MIDI-IN (test mock -> WebMIDIAPI)
 
 ```js
-const api = new WebMIDITestAPI();
+const api = require("web-midi-test-api");
 const device = api.createMIDIDevice();
 let input;
 
@@ -86,7 +84,7 @@ api.requestMIDIAccess().then((access) => {
 MIDI-OUT (WebMIDIAPI -> test mock)
 
 ```js
-const api = new WebMIDITestAPI();
+const api = require("web-midi-test-api");
 const device = api.createMIDIDevice();
 let output;
 
@@ -108,7 +106,7 @@ api.requestMIDIAccess().then((access) => {
 STATE CHANGE
 
 ```js
-const api = new WebMIDITestAPI();
+const api = require("web-midi-test-api");
 const device = api.createMIDIDevice();
 let input;
 

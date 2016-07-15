@@ -1,268 +1,344 @@
 "use strict";
 
-const assert = require("power-assert");
+const assert = require("assert");
+const test = require("eatest");
 const sinon = require("sinon");
+const events = require("events");
+const WebMIDITestAPI = require("../src/WebMIDITestAPI");
 const MIDIAccess = require("../src/MIDIAccess");
 const MIDIPort = require("../src/MIDIPort");
 const MIDIDevice = require("../src/MIDIDevice");
-const events = require('events');
 
-describe("MIDIPort", () => {
-  let access, device, port;
+test("new MIDIPort(access: MIDIAccess, port: MIDIDevice.MessagePort)", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
 
-  beforeEach(() => {
-    access = new MIDIAccess(new events.EventEmitter());
-    device = new MIDIDevice();
-    port = device.inputs[0];
+  assert(input instanceof MIDIPort);
+  assert(input.$access === access);
+  assert(input.$port === port);
+});
+
+test("#id: string", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+
+  assert(input.id === port.id);
+});
+
+test("#manufacturer: string", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+
+  assert(input.manufacturer === port.manufacturer);
+});
+
+test("#name: string", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+
+  assert(input.name === port.name);
+});
+
+test("#type: string", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+
+  assert(input.type === port.type);
+});
+
+test("#version: string", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+
+  assert(input.version === port.version);
+});
+
+test("#state: string", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+
+  assert(input.state === port.state);
+});
+
+test("#connection: string", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+
+  assert(input.connection === "closed");
+});
+
+test("#onstatechange: EventHandler", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+  const onstatechange = sinon.spy();
+  const event = {};
+
+  input.onstatechange = onstatechange;
+  input.onstatechange = {};
+  assert(input.onstatechange === onstatechange);
+
+  input.emit("statechange", event);
+  assert(onstatechange.calledOnce);
+  assert(onstatechange.args[0][0] === event);
+});
+
+test("#onstatechange: EventHandler = null", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+  const event = {};
+
+  input.onstatechange = null;
+  input.onstatechange = {};
+
+  assert(input.onstatechange === null);
+  assert.doesNotThrow(() => {
+    input.emit("statechange", event);
   });
+});
 
-  describe("constructor(access: MIDIAccess, port: MIDIDevice.MessagePort)", () => {
-    it("works", () => {
-      const input = new MIDIPort(access, port);
+test("#addEventListener(type: string, callback: function): void", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+  const onstatechange = sinon.spy();
+  const event = {};
 
-      assert(input instanceof MIDIPort);
-      assert(input.$access === access);
-      assert(input.$port === port);
-    });
+  input.addEventListener("statechange", onstatechange);
+
+  input.emit("statechange", event);
+  assert(onstatechange.calledOnce);
+  assert(onstatechange.args[0][0] === event);
+});
+
+test("#removeEventListener(type: string, callback: function): void", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+  const onstatechange = sinon.spy();
+  const event = {};
+
+  input.addEventListener("statechange", onstatechange);
+  input.removeEventListener("statechange", onstatechange);
+
+  input.emit("statechange", event);
+  assert(onstatechange.callCount === 0);
+});
+
+test("#open(): Promise<MIDIPort>", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+
+  access.onstatechange = sinon.spy();
+  input.onstatechange = sinon.spy();
+
+  return Promise.resolve().then(() => {
+    return device.connect();
+  }).then(() => {
+    return input.open();
+  }).then((value) => {
+    assert(value === input);
+    assert(input.connection === "open");
+    assert(access.onstatechange.calledOnce);
+    assert(access.onstatechange.args[0][0].port === input);
+    assert(input.onstatechange.calledOnce);
+    assert(input.onstatechange.args[0][0].port === input);
+
+    access.onstatechange.reset();
+    input.onstatechange.reset();
+
+    return input.open();
+  }).then((value) => {
+    assert(value === input);
+    assert(input.connection === "open");
+    assert(!access.onstatechange.called);
+    assert(!input.onstatechange.called);
   });
-  describe("#id: string", () => {
-    it("works", () => {
-      const input = new MIDIPort(access, port);
+});
 
-      assert(input.id === port.id);
-    });
+test("#open(): Promise<MIDIPort> / pending", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+
+  access.onstatechange = sinon.spy();
+  input.onstatechange = sinon.spy();
+
+  return Promise.resolve().then(() => {
+    return device.disconnect();
+  }).then(() => {
+    return input.open();
+  }).then((value) => {
+    assert(value === input);
+    assert(input.connection === "pending");
+    assert(access.onstatechange.calledOnce);
+    assert(access.onstatechange.args[0][0].port === input);
+    assert(input.onstatechange.calledOnce);
+    assert(input.onstatechange.args[0][0].port === input);
+
+    access.onstatechange.reset();
+    input.onstatechange.reset();
+
+    return input.open();
+  }).then((value) => {
+    assert(value === input);
+    assert(input.connection === "pending");
+    assert(!access.onstatechange.called);
+    assert(!input.onstatechange.called);
   });
-  describe("#manufacturer: string", () => {
-    it("works", () => {
-      const input = new MIDIPort(access, port);
+});
 
-      assert(input.manufacturer === port.manufacturer);
-    });
+test("#open(): Promise<MIDIPort> / pending -> open", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+
+  access.onstatechange = sinon.spy();
+  input.onstatechange = sinon.spy();
+
+  return Promise.resolve().then(() => {
+    return device.disconnect();
+  }).then(() => {
+    return input.open();
+  }).then((value) => {
+    assert(value === input);
+    assert(input.connection === "pending");
+    assert(access.onstatechange.calledOnce);
+    assert(access.onstatechange.args[0][0].port === input);
+    assert(input.onstatechange.calledOnce);
+    assert(input.onstatechange.args[0][0].port === input);
+
+    access.onstatechange.reset();
+    input.onstatechange.reset();
+
+    return device.connect();
+  }).then(() => {
+    assert(input.connection === "open");
+    assert(access.onstatechange.calledOnce);
+    assert(access.onstatechange.args[0][0].port === input);
+    assert(input.onstatechange.calledOnce);
+    assert(input.onstatechange.args[0][0].port === input);
   });
-  describe("#name: string", () => {
-    it("works", () => {
-      const input = new MIDIPort(access, port);
+});
 
-      assert(input.name === port.name);
-    });
+test("#close(): Promise<MIDIPort>", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+
+  access.onstatechange = sinon.spy();
+  input.onstatechange = sinon.spy();
+
+  return Promise.resolve().then(() => {
+    return device.connect();
+  }).then(() => {
+    return input.open();
+  }).then((value) => {
+    assert(value === input);
+    assert(input.connection === "open");
+
+    access.onstatechange.reset();
+    input.onstatechange.reset();
+
+    return input.close();
+  }).then((value) => {
+    assert(value === input);
+    assert(input.connection === "closed");
+    assert(access.onstatechange.calledOnce);
+    assert(access.onstatechange.args[0][0].port === input);
+    assert(input.onstatechange.calledOnce);
+    assert(input.onstatechange.args[0][0].port === input);
+
+    access.onstatechange.reset();
+    input.onstatechange.reset();
+
+    return input.close();
+  }).then((value) => {
+    assert(value === input);
+    assert(input.connection === "closed");
+    assert(!access.onstatechange.called);
+    assert(!input.onstatechange.called);
   });
-  describe("#type: string", () => {
-    it("works", () => {
-      const input = new MIDIPort(access, port);
+});
 
-      assert(input.type === port.type);
-    });
-  });
-  describe("#version: string", () => {
-    it("works", () => {
-      const input = new MIDIPort(access, port);
+test("#close(): Promise<MIDIPort> / open -> closed", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
 
-      assert(input.version === port.version);
-    });
-  });
-  describe("#state: string", () => {
-    it("works", () => {
-      const input = new MIDIPort(access, port);
+  access.onstatechange = sinon.spy();
+  input.onstatechange = sinon.spy();
 
-      assert(input.state === port.state);
-    });
-  });
-  describe("#connection: string", () => {
-    it("works", () => {
-      const input = new MIDIPort(access, port);
+  return Promise.resolve().then(() => {
+    return device.connect();
+  }).then(() => {
+    return input.open();
+  }).then((value) => {
+    assert(value === input);
+    assert(input.connection === "open");
 
-      assert(input.connection === "closed");
-    });
-  });
-  describe("#onstatechange: EventHandler", () => {
-    it("works", () => {
-      const input = new MIDIPort(access, port);
-      const onstatechange = sinon.spy();
-      const event = {};
+    access.onstatechange.reset();
+    input.onstatechange.reset();
 
-      input.onstatechange = onstatechange;
-      input.onstatechange = {};
-      assert(input.onstatechange === onstatechange);
+    return device.disconnect();
+  }).then(() => {
+    assert(input.connection === "closed");
+    assert(access.onstatechange.calledOnce);
+    assert(access.onstatechange.args[0][0].port === input);
+    assert(input.onstatechange.calledOnce);
+    assert(input.onstatechange.args[0][0].port === input);
 
-      input.emit("statechange", event);
-      assert(onstatechange.calledOnce);
-      assert(onstatechange.args[0][0] === event);
-    });
-    it("null", () => {
-      const input = new MIDIPort(access, port);
-      const event = {};
+    access.onstatechange.reset();
+    input.onstatechange.reset();
 
-      input.onstatechange = null;
-      input.onstatechange = {};
-
-      assert(input.onstatechange === null);
-      assert.doesNotThrow(() => {
-        input.emit("statechange", event);
-      });
-    });
-  });
-  describe("#open(): Promise<MIDIPort>", () => {
-    it("works", () => {
-      const input = new MIDIPort(access, port);
-
-      access.onstatechange = sinon.spy();
-      input.onstatechange = sinon.spy();
-
-      return Promise.resolve().then(() => {
-        return device.connect();
-      }).then(() => {
-        return input.open();
-      }).then((value) => {
-        assert(value === input);
-        assert(input.connection === "open");
-        assert(access.onstatechange.calledOnce);
-        assert(access.onstatechange.args[0][0].port === input);
-        assert(input.onstatechange.calledOnce);
-        assert(input.onstatechange.args[0][0].port === input);
-
-        access.onstatechange.reset();
-        input.onstatechange.reset();
-
-        return input.open();
-      }).then((value) => {
-        assert(value === input);
-        assert(input.connection === "open");
-        assert(!access.onstatechange.called);
-        assert(!input.onstatechange.called);
-      });
-    });
-    it("pending", () => {
-      const input = new MIDIPort(access, port);
-
-      access.onstatechange = sinon.spy();
-      input.onstatechange = sinon.spy();
-
-      return Promise.resolve().then(() => {
-        return device.disconnect();
-      }).then(() => {
-        return input.open();
-      }).then((value) => {
-        assert(value === input);
-        assert(input.connection === "pending");
-        assert(access.onstatechange.calledOnce);
-        assert(access.onstatechange.args[0][0].port === input);
-        assert(input.onstatechange.calledOnce);
-        assert(input.onstatechange.args[0][0].port === input);
-
-        access.onstatechange.reset();
-        input.onstatechange.reset();
-
-        return input.open();
-      }).then((value) => {
-        assert(value === input);
-        assert(input.connection === "pending");
-        assert(!access.onstatechange.called);
-        assert(!input.onstatechange.called);
-      });
-    });
-    it("pending -> open", () => {
-      const input = new MIDIPort(access, port);
-
-      access.onstatechange = sinon.spy();
-      input.onstatechange = sinon.spy();
-
-      return Promise.resolve().then(() => {
-        return device.disconnect();
-      }).then(() => {
-        return input.open();
-      }).then((value) => {
-        assert(value === input);
-        assert(input.connection === "pending");
-        assert(access.onstatechange.calledOnce);
-        assert(access.onstatechange.args[0][0].port === input);
-        assert(input.onstatechange.calledOnce);
-        assert(input.onstatechange.args[0][0].port === input);
-
-        access.onstatechange.reset();
-        input.onstatechange.reset();
-
-        return device.connect();
-      }).then(() => {
-        assert(input.connection === "open");
-        assert(access.onstatechange.calledOnce);
-        assert(access.onstatechange.args[0][0].port === input);
-        assert(input.onstatechange.calledOnce);
-        assert(input.onstatechange.args[0][0].port === input);
-      });
-    });
-  });
-  describe("#close(): Promise<MIDIPort>", () => {
-    it("works", () => {
-      const input = new MIDIPort(access, port);
-
-      access.onstatechange = sinon.spy();
-      input.onstatechange = sinon.spy();
-
-      return Promise.resolve().then(() => {
-        return device.connect();
-      }).then(() => {
-        return input.open();
-      }).then((value) => {
-        assert(value === input);
-        assert(input.connection === "open");
-
-        access.onstatechange.reset();
-        input.onstatechange.reset();
-
-        return input.close();
-      }).then((value) => {
-        assert(value === input);
-        assert(input.connection === "closed");
-        assert(access.onstatechange.calledOnce);
-        assert(access.onstatechange.args[0][0].port === input);
-        assert(input.onstatechange.calledOnce);
-        assert(input.onstatechange.args[0][0].port === input);
-
-        access.onstatechange.reset();
-        input.onstatechange.reset();
-
-        return input.close();
-      }).then((value) => {
-        assert(value === input);
-        assert(input.connection === "closed");
-        assert(!access.onstatechange.called);
-        assert(!input.onstatechange.called);
-      });
-    });
-    it("open -> closed", () => {
-      const input = new MIDIPort(access, port);
-
-      access.onstatechange = sinon.spy();
-      input.onstatechange = sinon.spy();
-
-      return Promise.resolve().then(() => {
-        return device.connect();
-      }).then(() => {
-        return input.open();
-      }).then((value) => {
-        assert(value === input);
-        assert(input.connection === "open");
-
-        access.onstatechange.reset();
-        input.onstatechange.reset();
-
-        return device.disconnect();
-      }).then(() => {
-        assert(input.connection === "closed");
-        assert(access.onstatechange.calledOnce);
-        assert(access.onstatechange.args[0][0].port === input);
-        assert(input.onstatechange.calledOnce);
-        assert(input.onstatechange.args[0][0].port === input);
-
-        access.onstatechange.reset();
-        input.onstatechange.reset();
-
-        return device.connect();
-      }).then(() => {
-        assert(input.connection === "closed");
-        assert(!access.onstatechange.called);
-        assert(!input.onstatechange.called);
-      });
-    });
+    return device.connect();
+  }).then(() => {
+    assert(input.connection === "closed");
+    assert(!access.onstatechange.called);
+    assert(!input.onstatechange.called);
   });
 });

@@ -1,77 +1,97 @@
 "use strict";
 
-const assert = require("power-assert");
+const assert = require("assert");
+const test = require("eatest");
 const sinon = require("sinon");
 const WebMIDITestAPI = require("../src/WebMIDITestAPI");
 const MIDIAccess = require("../src/MIDIAccess");
 
-describe("MIDIAccess", () => {
-  let api;
+test("new MIDIAccess(api: WebMIDITestAPI, opts = {})", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
 
-  beforeEach(() => {
-    api = new WebMIDITestAPI();
+  assert(access instanceof MIDIAccess);
+  assert(access.$api === api);
+})
+
+test("#inputs: Map<string, MIDIInput>", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
+
+  api.createMIDIDevice({ numberOfOutputs: 2 });
+  assert(access.inputs instanceof Map);
+  assert(access.inputs.size === 2);
+});
+
+test("#outputs: Map<string, MIDIOutput>", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
+
+  api.createMIDIDevice({ numberOfInputs: 2 });
+  assert(access.outputs instanceof Map);
+  assert(access.outputs.size === 2);
+});
+
+test("#onstatechange: EventHandler", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
+  const onstatechange = sinon.spy();
+  const event = {};
+
+  access.onstatechange = onstatechange;
+  access.onstatechange = {};
+  assert(access.onstatechange === onstatechange);
+
+  access.emit("statechange", event);
+  assert(onstatechange.calledOnce);
+  assert(onstatechange.args[0][0] === event);
+});
+
+test("#onstatechange: EventHandler = null", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
+  const event = {};
+
+  access.onstatechange = null;
+  access.onstatechange = {};
+
+  assert(access.onstatechange === null);
+  assert.doesNotThrow(() => {
+    access.emit("statechange", event);
   });
+});
 
-  describe("constructor(api: WebMIDITestAPI, opts = {})", () => {
-    it("works", () => {
-      const access = new MIDIAccess(api);
+test("#addEventListener(type: string, callback: function): void", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
+  const onstatechange = sinon.spy();
+  const event = {};
 
-      assert(access instanceof MIDIAccess);
-      assert(access.$api === api);
-    });
-  });
-  describe("#inputs: Map<string, MIDIInput>", () => {
-    it("works", () => {
-      const access = new MIDIAccess(api);
+  access.addEventListener("statechange", onstatechange);
 
-      api.createMIDIDevice({ numberOfOutputs: 2 });
-      assert(access.inputs instanceof Map);
-      assert(access.inputs.size === 2);
-    });
-  });
-  describe("#outputs: Map<string, MIDIOutput>", () => {
-    it("works", () => {
-      const access = new MIDIAccess(api);
+  access.emit("statechange", event);
+  assert(onstatechange.calledOnce);
+  assert(onstatechange.args[0][0] === event);
+});
 
-      api.createMIDIDevice({ numberOfInputs: 2 });
-      assert(access.outputs instanceof Map);
-      assert(access.outputs.size === 2);
-    });
-  });
-  describe("#onstatechange: EventHandler", () => {
-    it("works", () => {
-      const access = new MIDIAccess(api);
-      const onstatechange = sinon.spy();
-      const event = {};
+test("#removeEventListener(type: string, callback: function): void", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
+  const onstatechange = sinon.spy();
+  const event = {};
 
-      access.onstatechange = onstatechange;
-      access.onstatechange = {};
-      assert(access.onstatechange === onstatechange);
+  access.addEventListener("statechange", onstatechange);
+  access.removeEventListener("statechange", onstatechange);
 
-      access.emit("statechange", event);
-      assert(onstatechange.calledOnce);
-      assert(onstatechange.args[0][0] === event);
-    });
-    it("null", () => {
-      const access = new MIDIAccess(api);
-      const event = {};
+  access.emit("statechange", event);
+  assert(onstatechange.callCount === 0);
+});
 
-      access.onstatechange = null;
-      access.onstatechange = {};
+test("#sysexEnabled: boolean", () => {
+  const api = new WebMIDITestAPI();
+  const access1 = new MIDIAccess(api);
+  const access2 = new MIDIAccess(api, { sysex: true });
 
-      assert(access.onstatechange === null);
-      assert.doesNotThrow(() => {
-        access.emit("statechange", event);
-      });
-    });
-  });
-  describe("#sysexEnabled: boolean", () => {
-    it("works", () => {
-      const access1 = new MIDIAccess(api);
-      const access2 = new MIDIAccess(api, { sysex: true });
-
-      assert(access1.sysexEnabled === false);
-      assert(access2.sysexEnabled === true);
-    });
-  });
+  assert(access1.sysexEnabled === false);
+  assert(access2.sysexEnabled === true);
 });
