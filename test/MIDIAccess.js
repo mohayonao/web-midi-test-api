@@ -109,5 +109,5 @@ test("statechange / MIDIConnectionEvent", () => {
 
   assert(onstatechange.callCount === 2);
   assert(onstatechange.args[0][0].port.name === device.name);
-  assert(onstatechange.args[0][0].port.name === device.name);
+  assert(onstatechange.args[1][0].port.name === device.name);
 });
