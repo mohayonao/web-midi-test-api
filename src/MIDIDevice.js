@@ -6,7 +6,7 @@ const util = require("./util");
 let MidiPortIndex = 0;
 
 class MIDIDevice extends events.EventEmitter {
-  constructor(opts) {
+  constructor(api, opts) {
     opts = opts || {};
 
     const numberOfInputs = util.defaults(opts.numberOfInputs, 1);
@@ -14,12 +14,17 @@ class MIDIDevice extends events.EventEmitter {
 
     super();
 
+    this._api = api;
     this._manufacturer = util.defaults(opts.manufacturer, "");
     this._name = util.defaults(opts.name, "Web MIDI Test API");
     this._version = util.defaults(opts.version, "");
     this._inputs = Array.from({ length: numberOfInputs }, () => new MIDIDevice.MessageChannel(this));
     this._outputs = Array.from({ length: numberOfOutputs }, () => new MIDIDevice.MessageChannel(this));
     this._state = "connected";
+  }
+
+  get api() {
+    return this._api;
   }
 
   get manufacturer() {

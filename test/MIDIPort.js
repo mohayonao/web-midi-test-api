@@ -4,13 +4,15 @@ const assert = require("assert");
 const test = require("eatest");
 const sinon = require("sinon");
 const events = require("events");
+const WebMIDITestAPI = require("../src/WebMIDITestAPI");
 const MIDIAccess = require("../src/MIDIAccess");
 const MIDIPort = require("../src/MIDIPort");
 const MIDIDevice = require("../src/MIDIDevice");
 
 test("new MIDIPort(access: MIDIAccess, port: MIDIDevice.MessagePort)", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
 
@@ -20,8 +22,9 @@ test("new MIDIPort(access: MIDIAccess, port: MIDIDevice.MessagePort)", () => {
 });
 
 test("#id: string", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
 
@@ -29,8 +32,9 @@ test("#id: string", () => {
 });
 
 test("#manufacturer: string", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
 
@@ -38,8 +42,9 @@ test("#manufacturer: string", () => {
 });
 
 test("#name: string", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
 
@@ -47,8 +52,9 @@ test("#name: string", () => {
 });
 
 test("#type: string", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
 
@@ -56,8 +62,9 @@ test("#type: string", () => {
 });
 
 test("#version: string", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
 
@@ -65,8 +72,9 @@ test("#version: string", () => {
 });
 
 test("#state: string", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
 
@@ -74,8 +82,9 @@ test("#state: string", () => {
 });
 
 test("#connection: string", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
 
@@ -83,8 +92,9 @@ test("#connection: string", () => {
 });
 
 test("#onstatechange: EventHandler", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
   const onstatechange = sinon.spy();
@@ -100,8 +110,9 @@ test("#onstatechange: EventHandler", () => {
 });
 
 test("#onstatechange: EventHandler = null", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
   const event = {};
@@ -116,8 +127,9 @@ test("#onstatechange: EventHandler = null", () => {
 });
 
 test("#open(): Promise<MIDIPort>", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
 
@@ -149,8 +161,9 @@ test("#open(): Promise<MIDIPort>", () => {
 });
 
 test("#open(): Promise<MIDIPort> / pending", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
 
@@ -182,8 +195,9 @@ test("#open(): Promise<MIDIPort> / pending", () => {
 });
 
 test("#open(): Promise<MIDIPort> / pending -> open", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
 
@@ -216,8 +230,9 @@ test("#open(): Promise<MIDIPort> / pending -> open", () => {
 });
 
 test("#close(): Promise<MIDIPort>", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
 
@@ -257,8 +272,9 @@ test("#close(): Promise<MIDIPort>", () => {
 });
 
 test("#close(): Promise<MIDIPort> / open -> closed", () => {
+  const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());
-  const device = new MIDIDevice();
+  const device = new MIDIDevice(api);
   const port = device.inputs[0];
   const input = new MIDIPort(access, port);
 

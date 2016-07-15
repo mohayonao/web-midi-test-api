@@ -4,16 +4,19 @@ const assert = require("assert");
 const test = require("eatest");
 const sinon = require("sinon");
 const events = require("events");
+const WebMIDITestAPI = require("../src/WebMIDITestAPI");
 const MIDIDevice = require("../src/MIDIDevice");
 
-test("new MIDIDevice(opts = {})", () => {
-  const device = new MIDIDevice();
+test("new MIDIDevice(api, opts = {})", () => {
+  const api = new WebMIDITestAPI();
+  const device = new MIDIDevice(api);
 
   assert(device instanceof MIDIDevice);
 });
 
 test("#state: string", () => {
-  const device = new MIDIDevice();
+  const api = new WebMIDITestAPI();
+  const device = new MIDIDevice(api);
 
   assert(device.state === "connected");
 
@@ -25,19 +28,22 @@ test("#state: string", () => {
 });
 
 test("#numberOfInputs: number", () => {
-  const device = new MIDIDevice();
+  const api = new WebMIDITestAPI();
+  const device = new MIDIDevice(api);
 
   assert(device.numberOfInputs === 1);
 });
 
 test("#numberOfOutputs: number", () => {
-  const device = new MIDIDevice();
+  const api = new WebMIDITestAPI();
+  const device = new MIDIDevice(api);
 
   assert(device.numberOfOutputs === 1);
 });
 
 test("#inputs: MIDIDevice.MessagePort[]", () => {
-  const device = new MIDIDevice({ numberOfInputs: 2 });
+  const api = new WebMIDITestAPI();
+  const device = new MIDIDevice(api, { numberOfInputs: 2 });
 
   assert(device.inputs !== device.inputs);
   assert.deepEqual(device.inputs, device.inputs);
@@ -47,7 +53,8 @@ test("#inputs: MIDIDevice.MessagePort[]", () => {
 });
 
 test("#outputs: MIDIDevice.MessagePort[]", () => {
-  const device = new MIDIDevice({ numberOfOutputs: 2 });
+  const api = new WebMIDITestAPI();
+  const device = new MIDIDevice(api, { numberOfOutputs: 2 });
 
   assert(device.outputs !== device.outputs);
   assert.deepEqual(device.outputs, device.outputs);
@@ -57,7 +64,8 @@ test("#outputs: MIDIDevice.MessagePort[]", () => {
 });
 
 test("#connect(): void", () => {
-  const device = new MIDIDevice();
+  const api = new WebMIDITestAPI();
+  const device = new MIDIDevice(api);
   const onconnected = sinon.spy();
 
   device.on("connected", onconnected);
@@ -73,7 +81,8 @@ test("#connect(): void", () => {
 });
 
 test("#disconnect(): void", () => {
-  const device = new MIDIDevice();
+  const api = new WebMIDITestAPI();
+  const device = new MIDIDevice(api);
   const ondisconnected = sinon.spy();
 
   device.on("disconnected", ondisconnected);
