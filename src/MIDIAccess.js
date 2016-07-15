@@ -20,12 +20,12 @@ class MIDIAccess extends EventTarget {
     this._onstatechange = null;
 
     this.$api.on("deviceupdate", (device) => {
-      device.inputs.forEach((port) => {
+      device.outputs.forEach((port) => {
         this.emit("statechange", {
           port: new MIDIInput(this, port.target)
         });
       });
-      device.outputs.forEach((port) => {
+      device.inputs.forEach((port) => {
         this.emit("statechange", {
           port: new MIDIOutput(this, port.target)
         });
