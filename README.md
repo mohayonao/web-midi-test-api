@@ -62,19 +62,13 @@ MIDI-IN (test mock -> WebMIDIAPI)
 ```js
 const api = require("web-midi-test-api");
 const device = api.createMIDIDevice();
-let input;
 
 api.requestMIDIAccess().then((access) => {
-  input = access.inputs.values().next().value;
+  const input = access.inputs.values().next().value;
 
   input.onmidimessage = sinon.spy();
+  device.outputs[0].send([ 0x90, 0x30, 0x64 ]);
 
-  return input.open();
-}).then(() => {
-  assert(input.connection === "open");
-
-  return device.outputs[0].send([ 0x90, 0x30, 0x64 ]);
-}).then(() => {
   const message = input.onmidimessage.args[0][0].data;
 
   assert.deepEqual(message, new Uint8Array([ 0x90, 0x30, 0x64 ]));
@@ -86,17 +80,14 @@ MIDI-OUT (WebMIDIAPI -> test mock)
 ```js
 const api = require("web-midi-test-api");
 const device = api.createMIDIDevice();
-let output;
 
 device.inputs[0].onmidimessage = sinon.spy();
 
 api.requestMIDIAccess().then((access) => {
-  output = access.outputs.values().next().value;
+  const output = access.outputs.values().next().value;
 
-  return output.open();
-}).then(() => {
-  return output.send([ 0x90, 0x00, 0x00 ]);
-}).then(() => {
+  output.send([ 0x90, 0x00, 0x00 ]);
+
   const message = device.inputs[0].onmidimessage.args[0][0].data;
 
   assert.deepEqual(message, new Uint8Array([ 0x90, 0x00, 0x00 ]));
@@ -108,6 +99,7 @@ STATE CHANGE
 ```js
 const api = require("web-midi-test-api");
 const device = api.createMIDIDevice();
+
 let input;
 
 api.requestMIDIAccess().then((access) => {
