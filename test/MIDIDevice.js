@@ -94,7 +94,7 @@ test("#disconnect(): void", () => {
 });
 
 test("new MIDIDevice.MessageChannel(device: MIDIDevice)", () => {
-  const device = { manufacturer: "manufacturer", version: "version", state: "connected" };
+  const device = { manufacturer: "manufacturer", name: "name", version: "version", state: "connected" };
   const channel = new MIDIDevice.MessageChannel(device);
 
   assert(channel instanceof MIDIDevice.MessageChannel);
@@ -109,7 +109,7 @@ test("new MIDIDevice.MessageChannel(device: MIDIDevice)", () => {
 });
 
 test("#state", () => {
-  const device = { manufacturer: "manufacturer", version: "version", state: "connected" };
+  const device = { manufacturer: "manufacturer", name: "name", version: "version", state: "connected" };
   const channel = new MIDIDevice.MessageChannel(device);
 
   assert(channel.state === "connected");
