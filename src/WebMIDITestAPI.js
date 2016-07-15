@@ -6,7 +6,13 @@ const MIDIDevice = require("../src/MIDIDevice");
 
 // partial interface Navigator {
 //   Promise<MIDIAccess> requestMIDIAccess(optional MIDIOptions options);
-// };
+// }
+
+let _api = null;
+
+function getInstance() {
+  return _api || (_api = new WebMIDITestAPI());
+}
 
 class WebMIDITestAPI extends EventTarget {
   constructor() {
@@ -65,6 +71,44 @@ class WebMIDITestAPI extends EventTarget {
   requestMIDIAccess(opts) {
     return Promise.resolve(new MIDIAccess(this, opts));
   }
+
+  static get devices() {
+    return getInstance().devices;
+  }
+
+  static get inputs() {
+    return getInstance().inputs;
+  }
+
+  static get outputs() {
+    return getInstance().outputs;
+  }
+
+  static createMIDIDevice(opts) {
+    const device = new WebMIDITestAPI.MIDIDevice(opts);
+
+    device.connect();
+
+    return device;
+  }
+
+  static registerDevice(device) {
+    return getInstance().registerDevice(device);
+  }
+
+  static unregisterDevice(device) {
+    return getInstance().unregisterDevice(device);
+  }
+
+  static requestMIDIAccess(opts) {
+    return getInstance().requestMIDIAccess(opts);
+  }
 }
+
+WebMIDITestAPI.MIDIDevice = class MIDIDeviceBinded extends MIDIDevice {
+  constructor(opts) {
+    super(getInstance(), opts);
+  }
+};
 
 module.exports = WebMIDITestAPI;

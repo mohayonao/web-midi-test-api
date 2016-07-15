@@ -3,14 +3,13 @@
 const assert = require("assert");
 const test = require("eatest");
 const sinon = require("sinon");
-const WebMIDITestAPI = require("../src");
+const webmidi = require("../src");
 
-test("midi-in", () => {
-  const api = new WebMIDITestAPI();
-  const device = api.createMIDIDevice();
+test.fork("midi-in", () => {
+  const device = webmidi.createMIDIDevice();
   let input;
 
-  return api.requestMIDIAccess().then((access) => {
+  return webmidi.requestMIDIAccess().then((access) => {
     input = access.inputs.values().next().value;
 
     input.onmidimessage = sinon.spy();
@@ -39,14 +38,13 @@ test("midi-in", () => {
   });
 });
 
-test("midi-out", () => {
-  const api = new WebMIDITestAPI();
-  const device = api.createMIDIDevice();
+test.fork("midi-out", () => {
+  const device = webmidi.createMIDIDevice();
   let output;
 
   device.inputs[0].onmidimessage = sinon.spy();
 
-  return api.requestMIDIAccess().then((access) => {
+  return webmidi.requestMIDIAccess().then((access) => {
     output = access.outputs.values().next().value;
 
     return output.open();
