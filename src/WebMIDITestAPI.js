@@ -12,7 +12,12 @@ class WebMIDITestAPI extends events.EventEmitter {
   constructor() {
     super();
 
+    const _this = this;
+
     this.requestMIDIAccess = this.requestMIDIAccess.bind(this);
+    this.MIDIDevice = class MIDIDeviceBinded extends MIDIDevice {
+      constructor(opts) { super(_this, opts); }
+    };
 
     this._devices = [];
   }
@@ -30,13 +35,31 @@ class WebMIDITestAPI extends events.EventEmitter {
   }
 
   createMIDIDevice(opts) {
-    const device = new MIDIDevice(this, opts);
+    const device = new this.MIDIDevice(opts);
 
-    this._devices.push(device);
-
-    this.emit('statechange');
+    device.connect();
 
     return device;
+  }
+
+  registerDevice(device) {
+    if (device.api === this) {
+      if (this._devices.indexOf(device) === -1) {
+        this._devices.push(device);
+        this.emit("statechange");
+      }
+    }
+  }
+
+  unregisterDevice(device) {
+    if (device.api === this) {
+      const index = this._devices.indexOf(device);
+
+      if (index !== -1) {
+        this._devices.splice(index, 1);
+        this.emit("statechange");
+      }
+    }
   }
 
   requestMIDIAccess(opts) {

@@ -18,9 +18,6 @@ test("#state: string", () => {
   const api = new WebMIDITestAPI();
   const device = new MIDIDevice(api);
 
-  assert(device.state === "connected");
-
-  device.disconnect();
   assert(device.state === "disconnected");
 
   device.connect();
@@ -88,11 +85,12 @@ test("#disconnect(): void", () => {
   device.on("disconnected", ondisconnected);
 
   device.disconnect();
-  assert(ondisconnected.calledOnce);
-  ondisconnected.reset();
+  assert(!ondisconnected.called);
+
+  device.connect();
 
   device.disconnect();
-  assert(!ondisconnected.called);
+  assert(ondisconnected.calledOnce);
 });
 
 test("new MIDIDevice.MessageChannel(device: MIDIDevice)", () => {

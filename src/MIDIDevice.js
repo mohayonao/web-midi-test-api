@@ -20,7 +20,7 @@ class MIDIDevice extends events.EventEmitter {
     this._version = util.defaults(opts.version, "");
     this._inputs = Array.from({ length: numberOfInputs }, () => new MIDIDevice.MessageChannel(this));
     this._outputs = Array.from({ length: numberOfOutputs }, () => new MIDIDevice.MessageChannel(this));
-    this._state = "connected";
+    this._state = "disconnected";
   }
 
   get api() {
@@ -61,6 +61,7 @@ class MIDIDevice extends events.EventEmitter {
 
   connect() {
     if (this._state === "disconnected") {
+      this._api.registerDevice(this);
       this._state = "connected";
       this._inputs.concat(this._outputs).forEach((channel) => {
         channel.emit("connected");

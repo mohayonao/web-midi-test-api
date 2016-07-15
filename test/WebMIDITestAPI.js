@@ -13,6 +13,16 @@ test("new WebMIDITestAPI()", () => {
   assert(typeof api.requestMIDIAccess === "function");
 });
 
+test("#MIDIDevice", () => {
+  const api = new WebMIDITestAPI();
+  const device = new api.MIDIDevice();
+
+  assert(device instanceof MIDIDevice);
+  assert(device instanceof api.MIDIDevice);
+  assert(device.state === "disconnected");
+  assert(device.api === api);
+});
+
 test("#devices: MIDIDevice[]", () => {
   const api = new WebMIDITestAPI();
 
@@ -36,6 +46,9 @@ test("#createMIDIDevice(opts: any): MIDIDevice", () => {
   const device = api.createMIDIDevice();
 
   assert(device instanceof MIDIDevice);
+  assert(device instanceof api.MIDIDevice);
+  assert(device.state === "connected");
+  assert(device.api === api);
 });
 
 test("#requestMIDIAccess(opts: any): Promise<MIDIAccess>", () => {
