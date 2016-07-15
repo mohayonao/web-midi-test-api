@@ -67,14 +67,14 @@ test("#connect(): void", () => {
 
   device.on("connected", onconnected);
   device.disconnect();
-  assert(!onconnected.called);
+  assert(onconnected.callCount === 0);
 
   device.connect();
-  assert(onconnected.calledOnce);
+  assert(onconnected.callCount === 1);
   onconnected.reset();
 
   device.connect();
-  assert(!onconnected.called);
+  assert(onconnected.callCount === 0);
 });
 
 test("#disconnect(): void", () => {
@@ -85,12 +85,12 @@ test("#disconnect(): void", () => {
   device.on("disconnected", ondisconnected);
 
   device.disconnect();
-  assert(!ondisconnected.called);
+  assert(ondisconnected.callCount === 0);
 
   device.connect();
 
   device.disconnect();
-  assert(ondisconnected.calledOnce);
+  assert(ondisconnected.callCount === 1);
 });
 
 test("new MIDIDevice.MessageChannel(device: MIDIDevice)", () => {
@@ -182,7 +182,7 @@ test("#onmidimessage: EventHandler", () => {
   assert(port.onmidimessage === onmidimessage);
 
   port.emit("midimessage", event);
-  assert(onmidimessage.calledOnce);
+  assert(onmidimessage.callCount === 1);
   assert(onmidimessage.args[0][0] === event);
 });
 
@@ -211,14 +211,14 @@ test("#send(data: number[], timestamp: number): void", () => {
   port.send([ 0x90, 0x30, 0x64 ]);
 
   return Promise.resolve().then(() => {
-    assert(onmidimessage.calledOnce);
+    assert(onmidimessage.callCount === 1);
     assert(typeof onmidimessage.args[0][0].receivedTime === "number");
     assert.deepEqual(onmidimessage.args[0][0].data, new Uint8Array([ 0x90, 0x30, 0x64 ]));
     onmidimessage.reset();
 
     channel.state = "disconnected";
     port.send([ 0x90, 0x30, 0x64 ]);
-    assert(!onmidimessage.called);
+    assert(onmidimessage.callCount === 0);
 
     assert.throws(() => {
       port.send([ 0x00, 0x00, 0x00 ]);

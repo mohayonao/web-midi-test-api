@@ -48,22 +48,22 @@ class WebMIDITestAPI extends EventTarget {
     return device;
   }
 
-  registerDevice(device) {
+  addDevice(device) {
     if (device.api === this) {
       if (this._devices.indexOf(device) === -1) {
         this._devices.push(device);
-        this.emit("deviceupdate", device);
+        this.emit("add", device);
       }
     }
   }
 
-  unregisterDevice(device) {
+  removeDevice(device) {
     if (device.api === this) {
       const index = this._devices.indexOf(device);
 
       if (index !== -1) {
         this._devices.splice(index, 1);
-        this.emit("deviceupdate", device);
+        this.emit("remove", device);
       }
     }
   }

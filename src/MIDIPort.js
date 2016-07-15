@@ -28,21 +28,13 @@ class MIDIPort extends EventTarget {
     port.on("connected", () => {
       if (this.connection === "pending") {
         this._connection = "open";
-
-        const event = { port: this };
-
-        this.$access.emit("statechange", event);
-        this.emit("statechange", event);
+        this.emit("statechange", { port: this });
       }
     });
     port.on("disconnected", () => {
       if (this.connection !== "closed") {
         this._connection = "closed";
-
-        const event = { port: this };
-
-        this.$access.emit("statechange", event);
-        this.emit("statechange", event);
+        this.emit("statechange", { port: this });
       }
     });
   }
@@ -103,11 +95,7 @@ class MIDIPort extends EventTarget {
       }
 
       this._connection = "closed";
-
-      const event = { port: this };
-
-      this.$access.emit("statechange", event);
-      this.emit("statechange", event);
+      this.emit("statechange", { port: this });
 
       resolve(this);
     });
@@ -120,21 +108,12 @@ class MIDIPort extends EventTarget {
 
     if (this.state === "disconnected") {
       this._connection = "pending";
-
-      const event = { port: this };
-
-      this.$access.emit("statechange", event);
-      this.emit("statechange", event);
-
+      this.emit("statechange", { port: this });
       return;
     }
 
     this._connection = "open";
-
-    const event = { port: this };
-
-    this.$access.emit("statechange", event);
-    this.emit("statechange", event);
+    this.emit("statechange", { port: this });
   }
 }
 
