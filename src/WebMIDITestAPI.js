@@ -2,7 +2,7 @@
 
 const EventTarget = require("./EventTarget");
 const MIDIAccess = require("./MIDIAccess");
-const MIDIDevice = require("../src/MIDIDevice");
+const MIDIDevice = require("./MIDIDevice");
 
 // partial interface Navigator {
 //   Promise<MIDIAccess> requestMIDIAccess(optional MIDIOptions options);
@@ -52,7 +52,7 @@ class WebMIDITestAPI extends EventTarget {
     if (device.api === this) {
       if (this._devices.indexOf(device) === -1) {
         this._devices.push(device);
-        this.emit("statechange");
+        this.emit("deviceupdate", device);
       }
     }
   }
@@ -63,7 +63,7 @@ class WebMIDITestAPI extends EventTarget {
 
       if (index !== -1) {
         this._devices.splice(index, 1);
-        this.emit("statechange");
+        this.emit("deviceupdate", device);
       }
     }
   }
