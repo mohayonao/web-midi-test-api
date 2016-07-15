@@ -19,7 +19,18 @@ class MIDIAccess extends EventTarget {
     this._sysexEnabled = !!(opts && opts.sysex);
     this._onstatechange = null;
 
-    this.$api.on("statechange", e => this.emit("statechange", e));
+    this.$api.on("deviceupdate", (device) => {
+      device.inputs.forEach((port) => {
+        this.emit("statechange", {
+          port: new MIDIInput(this, port.target)
+        });
+      });
+      device.outputs.forEach((port) => {
+        this.emit("statechange", {
+          port: new MIDIOutput(this, port.target)
+        });
+      });
+    });
   }
 
   get inputs() {

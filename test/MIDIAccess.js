@@ -95,3 +95,19 @@ test("#sysexEnabled: boolean", () => {
   assert(access1.sysexEnabled === false);
   assert(access2.sysexEnabled === true);
 });
+
+test("statechange / MIDIConnectionEvent", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
+  const onstatechange = sinon.spy();
+
+  access.onstatechange = onstatechange;
+  access.onstatechange = {};
+  assert(access.onstatechange === onstatechange);
+
+  const device = api.createMIDIDevice({ name: "Test Device" });
+
+  assert(onstatechange.callCount === 2);
+  assert(onstatechange.args[0][0].port.name === device.name);
+  assert(onstatechange.args[0][0].port.name === device.name);
+});
