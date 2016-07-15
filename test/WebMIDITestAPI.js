@@ -1,61 +1,53 @@
 "use strict";
 
-const assert = require("power-assert");
+const assert = require("assert");
+const test = require("eatest");
 const WebMIDITestAPI = require("../src/WebMIDITestAPI");
 const MIDIAccess = require("../src/MIDIAccess");
 const MIDIDevice = require("../src/MIDIDevice");
 
-describe("WebMIDITestAPI", () => {
-  describe("constructor()", () => {
-    it("works", () => {
-      const api = new WebMIDITestAPI();
+test("new WebMIDITestAPI()", () => {
+  const api = new WebMIDITestAPI();
 
-      assert(api instanceof WebMIDITestAPI);
-      assert(typeof api.requestMIDIAccess === "function");
-    });
-  });
-  describe("#devices: MIDIDevice[]", () => {
-    it("works", () => {
-      const api = new WebMIDITestAPI();
+  assert(api instanceof WebMIDITestAPI);
+  assert(typeof api.requestMIDIAccess === "function");
+});
 
-      assert.deepEqual(api.devices, []);
-    });
-  });
-  describe("#inputs: MIDIDevice.MessagePort[]", () => {
-    it("works", () => {
-      const api = new WebMIDITestAPI();
+test("#devices: MIDIDevice[]", () => {
+  const api = new WebMIDITestAPI();
 
-      assert.deepEqual(api.inputs, []);
-    });
-  });
-  describe("#outputs: MIDIDevice.MessagePort[]", () => {
-    it("works", () => {
-      const api = new WebMIDITestAPI();
+  assert.deepEqual(api.devices, []);
+});
 
-      assert.deepEqual(api.outputs, []);
-    });
-  });
-  describe("#createMIDIDevice(opts: any): MIDIDevice", () => {
-    it("works", () => {
-      const api = new WebMIDITestAPI();
-      const device = api.createMIDIDevice();
+test("#inputs: MIDIDevice.MessagePort[]", () => {
+  const api = new WebMIDITestAPI();
 
-      assert(device instanceof MIDIDevice);
-    });
-  });
-  describe("#requestMIDIAccess(opts: any): Promise<MIDIAccess>", () => {
-    it("works", () => {
-      const api = new WebMIDITestAPI();
-      const navigator = { requestMIDIAccess: api.requestMIDIAccess };
+  assert.deepEqual(api.inputs, []);
+});
 
-      return Promise.all([
-        api.requestMIDIAccess(),
-        navigator.requestMIDIAccess()
-      ]).then((items) => {
-        assert(items[0] !== items[1]);
-        assert(items[0] instanceof MIDIAccess);
-        assert(items[1] instanceof MIDIAccess);
-      });
-    });
+test("#outputs: MIDIDevice.MessagePort[]", () => {
+  const api = new WebMIDITestAPI();
+
+  assert.deepEqual(api.outputs, []);
+});
+
+test("#createMIDIDevice(opts: any): MIDIDevice", () => {
+  const api = new WebMIDITestAPI();
+  const device = api.createMIDIDevice();
+
+  assert(device instanceof MIDIDevice);
+});
+
+test("#requestMIDIAccess(opts: any): Promise<MIDIAccess>", () => {
+  const api = new WebMIDITestAPI();
+  const navigator = { requestMIDIAccess: api.requestMIDIAccess };
+
+  return Promise.all([
+    api.requestMIDIAccess(),
+    navigator.requestMIDIAccess()
+  ]).then((items) => {
+    assert(items[0] !== items[1]);
+    assert(items[0] instanceof MIDIAccess);
+    assert(items[1] instanceof MIDIAccess);
   });
 });

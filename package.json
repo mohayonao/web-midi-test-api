@@ -13,9 +13,10 @@
     "babel-preset-power-assert": "^1.0.0",
     "babel-register": "^6.9.0",
     "cross-env": "^2.0.0",
+    "eater": "^3.0.0-5",
+    "eatest": "^0.4.0",
     "eslint": "^3.0.1",
     "eslint-plugin-node": "^2.0.0",
-    "mocha": "^2.5.3",
     "npm-run-all": "^2.3.0",
     "nyc": "^7.0.0",
     "power-assert": "^1.4.1",
@@ -47,13 +48,13 @@
     "build": "npm-run-all build:*",
     "build:to5": "cross-env BABEL_ENV=production babel --out-dir=lib src",
     "clean": "shx rm -rf lib coverage .nyc_output npm-debug.log",
-    "cover": "cross-env BABEL_ENV=coverage nyc --reporter text --reporter html mocha",
+    "cover": "cross-env BABEL_ENV=coverage nyc --reporter text --reporter html eater",
     "lint": "eslint src test",
-    "mocha": "mocha",
+    "eater": "eater",
     "postversion": "git push && git push --tags && npm run clean",
     "prepublish": "npm-run-all clean lint test build",
     "preversion": "npm-run-all clean lint test",
-    "test": "mocha --require babel-register",
-    "travis": "npm-run-all lint mocha"
+    "test": "eater --require babel-register",
+    "travis": "npm-run-all lint eater"
   }
 }

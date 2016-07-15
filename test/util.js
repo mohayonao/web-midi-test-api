@@ -1,84 +1,76 @@
 "use strict";
 
-const assert = require("power-assert");
+const assert = require("assert");
+const test = require("eatest");
 const util = require("../src/util");
 
-describe("util", () => {
-  describe("convertMIDIMessageToString(data: any): string", () => {
-    it("works", () => {
-      assert(util.convertMIDIMessageToString() === "NaN");
-      assert(util.convertMIDIMessageToString(100) === "0x64");
-      assert(util.convertMIDIMessageToString([ 0x90, 0x30, 0x64 ]) === "[0x90,0x30,0x64]");
-      assert(util.convertMIDIMessageToString(new Uint8Array([ 0x90, 0x30, 0x64 ])) === "[0x90,0x30,0x64]");
-    });
-  });
-  describe("dec2hex(value: number): string", () => {
-    it("works", () => {
-      assert(util.dec2hex(100) === "0x64");
-      assert(util.dec2hex(NaN) === "NaN");
-    });
-  });
-  describe("defaults(value: any, defaultValue: any): any", () => {
-    it("works", () => {
-      assert(util.defaults(0, 1) === 0);
-      assert(util.defaults(null, 1) === null);
-      assert(util.defaults(false, 1) === false);
-      assert(util.defaults("", 1) === "");
-      assert(isNaN(util.defaults(NaN, 1)));
-      assert(util.defaults(undefined, 1) === 1);
-    });
-  });
-  describe("validateMidiMessage", () => {
-    it("works", () => {
-      assert(util.validateMidiMessage() === false);
-      assert(util.validateMidiMessage([ 0x00, 0x00, 0x00 ]) === false);
-      assert(util.validateMidiMessage([ 0x80, 0x00, 0x00 ]) === true);
-      assert(util.validateMidiMessage([ 0x80, 0xff, 0xff ]) === false);
-      assert(util.validateMidiMessage([ 0x80, 0x00 ]) === false);
-      assert(util.validateMidiMessage([ 0x80, 0x00, 0x00, 0x00 ]) === false);
-      assert(util.validateMidiMessage([ 0x90, 0x00, 0x00 ]) === true);
-      assert(util.validateMidiMessage([ 0x90, 0xff, 0xff ]) === false);
-      assert(util.validateMidiMessage([ 0x90, 0x00 ]) === false);
-      assert(util.validateMidiMessage([ 0x90, 0x00, 0x00, 0x00 ]) === false);
-      assert(util.validateMidiMessage([ 0xa0, 0x00, 0x00 ]) === true);
-      assert(util.validateMidiMessage([ 0xa0, 0xff, 0xff ]) === false);
-      assert(util.validateMidiMessage([ 0xa0, 0x00 ]) === false);
-      assert(util.validateMidiMessage([ 0xa0, 0x00, 0x00, 0x00 ]) === false);
-      assert(util.validateMidiMessage([ 0xb0, 0x00, 0x00 ]) === true);
-      assert(util.validateMidiMessage([ 0xb0, 0xff, 0xff ]) === false);
-      assert(util.validateMidiMessage([ 0xb0, 0x00 ]) === false);
-      assert(util.validateMidiMessage([ 0xb0, 0x00, 0x00, 0x00 ]) === false);
-      assert(util.validateMidiMessage([ 0xc0, 0x00 ]) === true);
-      assert(util.validateMidiMessage([ 0xc0, 0xff ]) === false);
-      assert(util.validateMidiMessage([ 0xc0 ]) === false);
-      assert(util.validateMidiMessage([ 0xc0, 0x00, 0x00 ]) === false);
-      assert(util.validateMidiMessage([ 0xd0, 0x00 ]) === true);
-      assert(util.validateMidiMessage([ 0xd0, 0xff ]) === false);
-      assert(util.validateMidiMessage([ 0xd0 ]) === false);
-      assert(util.validateMidiMessage([ 0xd0, 0x00, 0x00 ]) === false);
-      assert(util.validateMidiMessage([ 0xe0, 0x00, 0x00 ]) === true);
-      assert(util.validateMidiMessage([ 0xe0, 0xff, 0xff ]) === false);
-      assert(util.validateMidiMessage([ 0xe0, 0x00 ]) === false);
-      assert(util.validateMidiMessage([ 0xe0, 0x00, 0x00, 0x00 ]) === false);
-      assert(util.validateMidiMessage([ 0xf0 ]) === true);
-      assert(util.validateMidiMessage([ 0xf0, 0x00 ]) === true);
-      assert(util.validateMidiMessage([ 0xf0, 0x00, 0x00 ]) === true);
-      assert(util.validateMidiMessage([ 0xf0, 0x00, 0x00, "0x00" ]) === false);
+test("convertMIDIMessageToString(data: any): string", () => {
+  assert(util.convertMIDIMessageToString() === "NaN");
+  assert(util.convertMIDIMessageToString(100) === "0x64");
+  assert(util.convertMIDIMessageToString([ 0x90, 0x30, 0x64 ]) === "[0x90,0x30,0x64]");
+  assert(util.convertMIDIMessageToString(new Uint8Array([ 0x90, 0x30, 0x64 ])) === "[0x90,0x30,0x64]");
+});
 
-      assert(util.validateMidiMessage(new Uint8Array([ 0x90, 0x00, 0x00 ])) === true);
-    });
-  });
+test("dec2hex(value: number): string", () => {
+  assert(util.dec2hex(100) === "0x64");
+  assert(util.dec2hex(NaN) === "NaN");
+});
 
-  describe("makeChannelName(deviceName: string): string", () => {
-    it("works", () => {
-      assert(util.makeChannelName("Test MIDI Device") === "Test MIDI Device");
-      assert(util.makeChannelName("Test MIDI Device") === "Test MIDI Device 2");
-      assert(util.makeChannelName("Test MIDI Device") === "Test MIDI Device 3");
+test("defaults(value: any, defaultValue: any): any", () => {
+  assert(util.defaults(0, 1) === 0);
+  assert(util.defaults(null, 1) === null);
+  assert(util.defaults(false, 1) === false);
+  assert(util.defaults("", 1) === "");
+  assert(isNaN(util.defaults(NaN, 1)));
+  assert(util.defaults(undefined, 1) === 1);
+});
 
-      assert(util.makeChannelName("Test MIDI Device II 4") === "Test MIDI Device II 4");
-      assert(util.makeChannelName("Test MIDI Device II") === "Test MIDI Device II 5");
-      assert(util.makeChannelName("Test MIDI Device II 8") === "Test MIDI Device II 8");
-      assert(util.makeChannelName("Test MIDI Device II") === "Test MIDI Device II 9");
-    });
-  });
+test("validateMidiMessage", () => {
+  assert(util.validateMidiMessage() === false);
+  assert(util.validateMidiMessage([ 0x00, 0x00, 0x00 ]) === false);
+  assert(util.validateMidiMessage([ 0x80, 0x00, 0x00 ]) === true);
+  assert(util.validateMidiMessage([ 0x80, 0xff, 0xff ]) === false);
+  assert(util.validateMidiMessage([ 0x80, 0x00 ]) === false);
+  assert(util.validateMidiMessage([ 0x80, 0x00, 0x00, 0x00 ]) === false);
+  assert(util.validateMidiMessage([ 0x90, 0x00, 0x00 ]) === true);
+  assert(util.validateMidiMessage([ 0x90, 0xff, 0xff ]) === false);
+  assert(util.validateMidiMessage([ 0x90, 0x00 ]) === false);
+  assert(util.validateMidiMessage([ 0x90, 0x00, 0x00, 0x00 ]) === false);
+  assert(util.validateMidiMessage([ 0xa0, 0x00, 0x00 ]) === true);
+  assert(util.validateMidiMessage([ 0xa0, 0xff, 0xff ]) === false);
+  assert(util.validateMidiMessage([ 0xa0, 0x00 ]) === false);
+  assert(util.validateMidiMessage([ 0xa0, 0x00, 0x00, 0x00 ]) === false);
+  assert(util.validateMidiMessage([ 0xb0, 0x00, 0x00 ]) === true);
+  assert(util.validateMidiMessage([ 0xb0, 0xff, 0xff ]) === false);
+  assert(util.validateMidiMessage([ 0xb0, 0x00 ]) === false);
+  assert(util.validateMidiMessage([ 0xb0, 0x00, 0x00, 0x00 ]) === false);
+  assert(util.validateMidiMessage([ 0xc0, 0x00 ]) === true);
+  assert(util.validateMidiMessage([ 0xc0, 0xff ]) === false);
+  assert(util.validateMidiMessage([ 0xc0 ]) === false);
+  assert(util.validateMidiMessage([ 0xc0, 0x00, 0x00 ]) === false);
+  assert(util.validateMidiMessage([ 0xd0, 0x00 ]) === true);
+  assert(util.validateMidiMessage([ 0xd0, 0xff ]) === false);
+  assert(util.validateMidiMessage([ 0xd0 ]) === false);
+  assert(util.validateMidiMessage([ 0xd0, 0x00, 0x00 ]) === false);
+  assert(util.validateMidiMessage([ 0xe0, 0x00, 0x00 ]) === true);
+  assert(util.validateMidiMessage([ 0xe0, 0xff, 0xff ]) === false);
+  assert(util.validateMidiMessage([ 0xe0, 0x00 ]) === false);
+  assert(util.validateMidiMessage([ 0xe0, 0x00, 0x00, 0x00 ]) === false);
+  assert(util.validateMidiMessage([ 0xf0 ]) === true);
+  assert(util.validateMidiMessage([ 0xf0, 0x00 ]) === true);
+  assert(util.validateMidiMessage([ 0xf0, 0x00, 0x00 ]) === true);
+  assert(util.validateMidiMessage([ 0xf0, 0x00, 0x00, "0x00" ]) === false);
+
+  assert(util.validateMidiMessage(new Uint8Array([ 0x90, 0x00, 0x00 ])) === true);
+});
+
+test("makeChannelName(deviceName: string): string", () => {
+  assert(util.makeChannelName("Test MIDI Device") === "Test MIDI Device");
+  assert(util.makeChannelName("Test MIDI Device") === "Test MIDI Device 2");
+  assert(util.makeChannelName("Test MIDI Device") === "Test MIDI Device 3");
+
+  assert(util.makeChannelName("Test MIDI Device II 4") === "Test MIDI Device II 4");
+  assert(util.makeChannelName("Test MIDI Device II") === "Test MIDI Device II 5");
+  assert(util.makeChannelName("Test MIDI Device II 8") === "Test MIDI Device II 8");
+  assert(util.makeChannelName("Test MIDI Device II") === "Test MIDI Device II 9");
 });
