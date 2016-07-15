@@ -2,7 +2,7 @@
 
 const EventTarget = require("./EventTarget");
 const MIDIAccess = require("./MIDIAccess");
-const MIDIDevice = require("../src/MIDIDevice");
+const MIDIDevice = require("./MIDIDevice");
 
 // partial interface Navigator {
 //   Promise<MIDIAccess> requestMIDIAccess(optional MIDIOptions options);
