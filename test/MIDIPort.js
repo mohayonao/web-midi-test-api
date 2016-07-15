@@ -126,6 +126,38 @@ test("#onstatechange: EventHandler = null", () => {
   });
 });
 
+test("#addEventListener(type: string, callback: function): void", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+  const onstatechange = sinon.spy();
+  const event = {};
+
+  input.addEventListener("statechange", onstatechange);
+
+  input.emit("statechange", event);
+  assert(onstatechange.calledOnce);
+  assert(onstatechange.args[0][0] === event);
+});
+
+test("#removeEventListener(type: string, callback: function): void", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(new events.EventEmitter());
+  const device = new MIDIDevice(api);
+  const port = device.inputs[0];
+  const input = new MIDIPort(access, port);
+  const onstatechange = sinon.spy();
+  const event = {};
+
+  input.addEventListener("statechange", onstatechange);
+  input.removeEventListener("statechange", onstatechange);
+
+  input.emit("statechange", event);
+  assert(onstatechange.callCount === 0);
+});
+
 test("#open(): Promise<MIDIPort>", () => {
   const api = new WebMIDITestAPI();
   const access = new MIDIAccess(new events.EventEmitter());

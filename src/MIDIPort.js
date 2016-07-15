@@ -1,6 +1,6 @@
 "use strict";
 
-const events = require("events");
+const EventTarget = require("./EventTarget");
 
 // interface MIDIPort : EventTarget {
 //   readonly  attribute DOMString               id;
@@ -15,7 +15,7 @@ const events = require("events");
 //   Promise<MIDIPort> close();
 // };
 
-class MIDIPort extends events.EventEmitter {
+class MIDIPort extends EventTarget {
   constructor(access, port) {
     super();
 
@@ -25,11 +25,6 @@ class MIDIPort extends events.EventEmitter {
     this._connection = "closed";
     this._onstatechange = null;
 
-    this.on("statechange", (e) => {
-      if (this._onstatechange !== null) {
-        this._onstatechange.call(this, e);
-      }
-    });
     port.on("connected", () => {
       if (this.connection === "pending") {
         this._open().then(() => {
@@ -130,7 +125,7 @@ class MIDIPort extends events.EventEmitter {
   _close() {
     return Promise.resolve(this);
   }
-  
+
   _implicitOpen() {
       if (this.connection === "open" || this.connection === "pending") {
         return;

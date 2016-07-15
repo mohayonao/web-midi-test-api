@@ -1,6 +1,6 @@
 "use strict";
 
-const events = require("events");
+const EventTarget = require("./EventTarget");
 const MIDIAccess = require("./MIDIAccess");
 const MIDIDevice = require("../src/MIDIDevice");
 
@@ -8,7 +8,7 @@ const MIDIDevice = require("../src/MIDIDevice");
 //   Promise<MIDIAccess> requestMIDIAccess(optional MIDIOptions options);
 // };
 
-class WebMIDITestAPI extends events.EventEmitter {
+class WebMIDITestAPI extends EventTarget {
   constructor() {
     super();
 

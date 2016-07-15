@@ -61,6 +61,32 @@ test("#onstatechange: EventHandler = null", () => {
   });
 });
 
+test("#addEventListener(type: string, callback: function): void", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
+  const onstatechange = sinon.spy();
+  const event = {};
+
+  access.addEventListener("statechange", onstatechange);
+
+  access.emit("statechange", event);
+  assert(onstatechange.calledOnce);
+  assert(onstatechange.args[0][0] === event);
+});
+
+test("#removeEventListener(type: string, callback: function): void", () => {
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
+  const onstatechange = sinon.spy();
+  const event = {};
+
+  access.addEventListener("statechange", onstatechange);
+  access.removeEventListener("statechange", onstatechange);
+
+  access.emit("statechange", event);
+  assert(onstatechange.callCount === 0);
+});
+
 test("#sysexEnabled: boolean", () => {
   const api = new WebMIDITestAPI();
   const access1 = new MIDIAccess(api);

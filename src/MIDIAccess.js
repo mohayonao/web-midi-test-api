@@ -1,6 +1,6 @@
 "use strict";
 
-const events = require("events");
+const EventTarget = require("./EventTarget");
 const MIDIInput = require("./MIDIInput");
 const MIDIOutput = require("./MIDIOutput");
 
@@ -11,7 +11,7 @@ const MIDIOutput = require("./MIDIOutput");
 //   readonly  attribute boolean       sysexEnabled;
 // };
 
-class MIDIAccess extends events.EventEmitter {
+class MIDIAccess extends EventTarget {
   constructor(api, opts) {
     super();
 
@@ -19,11 +19,6 @@ class MIDIAccess extends events.EventEmitter {
     this._sysexEnabled = !!(opts && opts.sysex);
     this._onstatechange = null;
 
-    this.on("statechange", (e) => {
-      if (this._onstatechange !== null) {
-        this._onstatechange.call(this, e);
-      }
-    });
     this.$api.on("statechange", e => this.emit("statechange", e));
   }
 

@@ -1,11 +1,11 @@
 "use strict";
 
-const events = require("events");
+const EventTarget = require("./EventTarget");
 const util = require("./util");
 
 let MidiPortIndex = 0;
 
-class MIDIDevice extends events.EventEmitter {
+class MIDIDevice extends EventTarget {
   constructor(api, opts) {
     opts = opts || {};
 
@@ -81,7 +81,7 @@ class MIDIDevice extends events.EventEmitter {
   }
 }
 
-MIDIDevice.MessageChannel = class MIDIDeviceMessageChannel extends events.EventEmitter {
+MIDIDevice.MessageChannel = class MIDIDeviceMessageChannel extends EventTarget {
   constructor(device) {
     super();
 
@@ -111,7 +111,7 @@ MIDIDevice.MessageChannel = class MIDIDeviceMessageChannel extends events.EventE
   }
 };
 
-MIDIDevice.MessagePort = class MIDIDeviceMessagePort extends events.EventEmitter {
+MIDIDevice.MessagePort = class MIDIDeviceMessagePort extends EventTarget {
   constructor(channel, type) {
     super();
 
@@ -119,12 +119,6 @@ MIDIDevice.MessagePort = class MIDIDeviceMessagePort extends events.EventEmitter
     this.target = null;
     this._type = type;
     this._onmidimessage = null;
-
-    this.on("midimessage", (e) => {
-      if (this._onmidimessage !== null) {
-        this._onmidimessage.call(this, e);
-      }
-    });
   }
 
   get id() {
