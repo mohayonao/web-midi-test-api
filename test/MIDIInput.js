@@ -3,14 +3,15 @@
 const assert = require("assert");
 const test = require("eatest");
 const sinon = require("sinon");
-const events = require("events");
+const WebMIDITestAPI = require("../src/WebMIDITestAPI");
 const MIDIAccess = require("../src/MIDIAccess");
 const MIDIPort = require("../src/MIDIPort");
 const MIDIInput = require("../src/MIDIInput");
 const MIDIDevice = require("../src/MIDIDevice");
 
 test("new MIDIInput(access: MIDIAccess, port: MIDIDevice.MessagePort)", () => {
-  const access = new MIDIAccess(new events.EventEmitter());
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
   const port = new MIDIDevice.MessagePort({}, "input");
   const input = new MIDIInput(access, port);
 
@@ -19,7 +20,8 @@ test("new MIDIInput(access: MIDIAccess, port: MIDIDevice.MessagePort)", () => {
 });
 
 test("#type: string", () => {
-  const access = new MIDIAccess(new events.EventEmitter());
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
   const port = new MIDIDevice.MessagePort({}, "input");
   const input = new MIDIInput(access, port);
 
@@ -27,7 +29,8 @@ test("#type: string", () => {
 });
 
 test("#onmidimessage: EventHandler", () => {
-  const access = new MIDIAccess(new events.EventEmitter());
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
   const port = new MIDIDevice.MessagePort({}, "input");
   const input = new MIDIInput(access, port);
   const onmidimessage = sinon.spy();
@@ -41,19 +44,20 @@ test("#onmidimessage: EventHandler", () => {
     return input.open();
   }).then(() => {
     port.emit("midimessage", event);
-    assert(onmidimessage.calledOnce);
+    assert(onmidimessage.callCount === 1);
     assert(onmidimessage.args[0][0] === event);
     onmidimessage.reset();
   }).then(() => {
     return input.close();
   }).then(() => {
     port.emit("midimessage", event);
-    assert(!onmidimessage.called);
+    assert(onmidimessage.callCount === 0);
   });
 });
 
 test("#onmidimessage: EventHandler = null", () => {
-  const access = new MIDIAccess(new events.EventEmitter());
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
   const port = new MIDIDevice.MessagePort({}, "input");
   const input = new MIDIInput(access, port);
   const event = {};

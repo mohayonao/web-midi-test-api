@@ -43,7 +43,7 @@ test("#onstatechange: EventHandler", () => {
   assert(access.onstatechange === onstatechange);
 
   access.emit("statechange", event);
-  assert(onstatechange.calledOnce);
+  assert(onstatechange.callCount === 1);
   assert(onstatechange.args[0][0] === event);
 });
 
@@ -70,7 +70,7 @@ test("#addEventListener(type: string, callback: function): void", () => {
   access.addEventListener("statechange", onstatechange);
 
   access.emit("statechange", event);
-  assert(onstatechange.calledOnce);
+  assert(onstatechange.callCount === 1);
   assert(onstatechange.args[0][0] === event);
 });
 

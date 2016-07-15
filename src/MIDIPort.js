@@ -27,26 +27,14 @@ class MIDIPort extends EventTarget {
 
     port.on("connected", () => {
       if (this.connection === "pending") {
-        this._open().then(() => {
-          this._connection = "open";
-
-          const event = { port: this };
-
-          this.$access.emit("statechange", event);
-          this.emit("statechange", event);
-        });
+        this._connection = "open";
+        this.emit("statechange", { port: this });
       }
     });
     port.on("disconnected", () => {
       if (this.connection !== "closed") {
-        this._close().then(() => {
-          this._connection = "closed";
-
-          const event = { port: this };
-
-          this.$access.emit("statechange", event);
-          this.emit("statechange", event);
-        });
+        this._connection = "closed";
+        this.emit("statechange", { port: this });
       }
     });
   }
@@ -101,53 +89,31 @@ class MIDIPort extends EventTarget {
   }
 
   close() {
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       if (this.connection === "closed") {
         return resolve(this);
       }
 
-      return this._close().then(() => {
-        this._connection = "closed";
+      this._connection = "closed";
+      this.emit("statechange", { port: this });
 
-        const event = { port: this };
-
-        this.$access.emit("statechange", event);
-        this.emit("statechange", event);
-
-        resolve(this);
-      }, reject);
+      resolve(this);
     });
   }
 
-  _open() {
-    return Promise.resolve(this);
-  }
-  _close() {
-    return Promise.resolve(this);
-  }
-
   _implicitOpen() {
-      if (this.connection === "open" || this.connection === "pending") {
-        return;
-      }
+    if (this.connection === "open" || this.connection === "pending") {
+      return;
+    }
 
-      if (this.state === "disconnected") {
-        this._connection = "pending";
+    if (this.state === "disconnected") {
+      this._connection = "pending";
+      this.emit("statechange", { port: this });
+      return;
+    }
 
-        const event = { port: this };
-
-        this.$access.emit("statechange", event);
-        this.emit("statechange", event);
-
-        return;
-      }
-
-      this._connection = "open";
-
-      const event = { port: this };
-
-      this.$access.emit("statechange", event);
-      this.emit("statechange", event);
+    this._connection = "open";
+    this.emit("statechange", { port: this });
   }
 }
 

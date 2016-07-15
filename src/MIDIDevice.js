@@ -61,12 +61,12 @@ class MIDIDevice extends EventTarget {
 
   connect() {
     if (this._state === "disconnected") {
-      this._api.registerDevice(this);
       this._state = "connected";
       this._inputs.concat(this._outputs).forEach((channel) => {
         channel.emit("connected");
       });
       this.emit("connected");
+      this._api.addDevice(this);
     }
   }
 

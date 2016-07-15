@@ -2,14 +2,15 @@
 
 const assert = require("assert");
 const test = require("eatest");
-const events = require("events");
+const WebMIDITestAPI = require("../src/WebMIDITestAPI");
 const MIDIAccess = require("../src/MIDIAccess");
 const MIDIPort = require("../src/MIDIPort");
 const MIDIOutput = require("../src/MIDIOutput");
 const MIDIDevice = require("../src/MIDIDevice");
 
 test("new MIDIOutput(access: MIDIAccess, port: MIDIDevice.MessagePort)", () => {
-  const access = new MIDIAccess(new events.EventEmitter());
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
   const port = new MIDIDevice.MessagePort({}, "output");
   const output = new MIDIOutput(access, port);
 
@@ -18,7 +19,8 @@ test("new MIDIOutput(access: MIDIAccess, port: MIDIDevice.MessagePort)", () => {
 });
 
 test("#type: string", () => {
-  const access = new MIDIAccess(new events.EventEmitter());
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
   const port = new MIDIDevice.MessagePort({}, "output");
   const output = new MIDIOutput(access, port);
 
@@ -26,7 +28,8 @@ test("#type: string", () => {
 });
 
 test("#send(data: number[]): void", () => {
-  const access = new MIDIAccess(new events.EventEmitter());
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
   const port = new MIDIDevice.MessagePort({}, "output");
   const output = new MIDIOutput(access, port);
 
@@ -40,7 +43,8 @@ test("#send(data: number[]): void", () => {
 });
 
 test("#send(data: number[]): void / sysex:false", () => {
-  const access = new MIDIAccess(new events.EventEmitter());
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api, { sysex: false });
   const port = new MIDIDevice.MessagePort({}, "output");
   const output = new MIDIOutput(access, port);
 
@@ -50,7 +54,8 @@ test("#send(data: number[]): void / sysex:false", () => {
 });
 
 test("#send(data: number[]): void / sysex:true", () => {
-  const access = new MIDIAccess(new events.EventEmitter(), { sysex: true });
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api, { sysex: true });
   const port = new MIDIDevice.MessagePort({}, "output");
   const output = new MIDIOutput(access, port);
 
@@ -60,7 +65,8 @@ test("#send(data: number[]): void / sysex:true", () => {
 });
 
 test("#clear(): void", () => {
-  const access = new MIDIAccess(new events.EventEmitter());
+  const api = new WebMIDITestAPI();
+  const access = new MIDIAccess(api);
   const port = new MIDIDevice.MessagePort({}, "output");
   const output = new MIDIOutput(access, port);
 
