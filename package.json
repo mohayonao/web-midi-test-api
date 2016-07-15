@@ -1,7 +1,7 @@
 {
   "name": "web-midi-test-api",
   "description": "Web MIDI API for CI",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "author": "Nao Yonamine <mohayonao@gmail.com>",
   "bugs": {
     "url": "https://github.com/mohayonao/web-midi-test-api/issues"
