@@ -206,10 +206,12 @@ test("#open(): Promise<MIDIPort> / pending", () => {
   }).then((value) => {
     assert(value === input);
     assert(input.connection === "pending");
-    assert(access.onstatechange.callCount === 1);
-    assert(access.onstatechange.args[0][0].port === input);
-    assert(input.onstatechange.callCount === 1);
+    assert(access.onstatechange.callCount === 3);
+    assert(access.onstatechange.args[1][0].port === input);
+    assert(access.onstatechange.args[2][0].port === input);
+    assert(input.onstatechange.callCount === 2);
     assert(input.onstatechange.args[0][0].port === input);
+    assert(input.onstatechange.args[1][0].port === input);
 
     access.onstatechange.reset();
     input.onstatechange.reset();
@@ -239,10 +241,12 @@ test("#open(): Promise<MIDIPort> / pending -> open", () => {
   }).then((value) => {
     assert(value === input);
     assert(input.connection === "pending");
-    assert(access.onstatechange.callCount === 1);
-    assert(access.onstatechange.args[0][0].port === input);
-    assert(input.onstatechange.callCount === 1);
+    assert(access.onstatechange.callCount === 3);
+    assert(access.onstatechange.args[1][0].port === input);
+    assert(access.onstatechange.args[2][0].port === input);
+    assert(input.onstatechange.callCount === 2);
     assert(input.onstatechange.args[0][0].port === input);
+    assert(input.onstatechange.args[1][0].port === input);
 
     access.onstatechange.reset();
     input.onstatechange.reset();
@@ -250,8 +254,8 @@ test("#open(): Promise<MIDIPort> / pending -> open", () => {
     return device.connect();
   }).then(() => {
     assert(input.connection === "open");
-    assert(access.onstatechange.callCount === 1);
-    assert(access.onstatechange.args[0][0].port === input);
+    assert(access.onstatechange.callCount === 2);
+    assert(access.onstatechange.args[1][0].port === input);
     assert(input.onstatechange.callCount === 1);
     assert(input.onstatechange.args[0][0].port === input);
   });
@@ -321,8 +325,8 @@ test("#close(): Promise<MIDIPort> / open -> closed", () => {
     return device.disconnect();
   }).then(() => {
     assert(input.connection === "closed");
-    assert(access.onstatechange.callCount === 1);
-    assert(access.onstatechange.args[0][0].port === input);
+    assert(access.onstatechange.callCount === 2);
+    assert(access.onstatechange.args[1][0].port === input);
     assert(input.onstatechange.callCount === 1);
     assert(input.onstatechange.args[0][0].port === input);
 
@@ -332,7 +336,7 @@ test("#close(): Promise<MIDIPort> / open -> closed", () => {
     return device.connect();
   }).then(() => {
     assert(input.connection === "closed");
-    assert(access.onstatechange.callCount === 0);
-    assert(input.onstatechange.callCount === 0);
+    assert(access.onstatechange.callCount === 2);
+    assert(input.onstatechange.callCount === 1);
   });
 });

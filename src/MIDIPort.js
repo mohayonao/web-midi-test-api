@@ -28,14 +28,14 @@ class MIDIPort extends EventTarget {
     port.on("connected", () => {
       if (this.connection === "pending") {
         this._connection = "open";
-        this.emit("statechange", { port: this });
       }
+      this.emit("statechange", { port: this });
     });
     port.on("disconnected", () => {
       if (this.connection !== "closed") {
         this._connection = "closed";
-        this.emit("statechange", { port: this });
       }
+      this.emit("statechange", { port: this });
     });
   }
 
